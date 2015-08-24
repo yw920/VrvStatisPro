@@ -138,6 +138,7 @@ public class UserLoginAction extends ActionSupport {
 	        return macAddress;
 		   }
     private void test1(){}
+			  private void test2(){}
 
 
 
