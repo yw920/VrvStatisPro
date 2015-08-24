@@ -21,12 +21,12 @@ import com.vrv.service.UserLoginService;
 import com.vrv.dao.*;
 
 public class UserLoginAction extends ActionSupport {
-	
+
 	private UserLoginService userLoginService;
 	private LoginloginfoDAO loginloginfoDAO;
-	
+
 	private String userName;
-	
+
 	public LoginloginfoDAO getLoginloginfoDAO() {
 		return loginloginfoDAO;
 	}
@@ -36,9 +36,9 @@ public class UserLoginAction extends ActionSupport {
 	}
 
 	private String passWord;
-	
+
 	private String hostName;
-	
+
 	public String getHostName() {
 		return hostName;
 	}
@@ -48,40 +48,40 @@ public class UserLoginAction extends ActionSupport {
 	}
 
 	public String execute() throws IOException, ParseException{
-	
-		
+
+
 		boolean result = userLoginService.queryIfExist(userName,passWord);
-		
+
 		String ip = getRomoteIP(ServletActionContext.getRequest());
 		String mac = getMACAddress(ip);
-				
+
 		if(result){
-			
+
 			Map<String, Object> map = ActionContext.getContext().getSession();
 			map.put("username", userName);
 			@SuppressWarnings("deprecation")
 			String time = new Date().toLocaleString();
-			Loginloginfo loginLoginfo = new Loginloginfo(userName,time,hostName,mac,ip,new Date());	
+			Loginloginfo loginLoginfo = new Loginloginfo(userName,time,hostName,mac,ip,new Date());
 			//loginloginfoDAO.insertInstance(loginLoginfo);
-		
+
 			loginloginfoDAO.save(loginLoginfo);
-			
-			
-			
+
+
+
 			return SUCCESS;
-			
+
 		}
-		
+
 		Map<String, Object> map = ActionContext.getContext().getSession();
 		map.clear();
-		
-		
+
+
 			return LOGIN;
-			
-	
-		
-		
-	
+
+
+
+
+
 	}
 
 	public UserLoginService getUserLoginService() {
@@ -107,38 +107,38 @@ public class UserLoginAction extends ActionSupport {
 	public void setPassWord(String passWord) {
 		this.passWord = passWord;
 	}
-	
+
 	private String getRomoteIP(HttpServletRequest re){
 		if(re.getHeader("x-forwarded-for")==null){
 			return re.getRemoteAddr();
 		}
 		return re.getHeader("x-forwarded-for");
 	}
-	
-	private String getMACAddress(String ip) {  
-		        String str = "";  
-		       String macAddress = "";  
-		       try {  
-		           Process p = Runtime.getRuntime().exec("nbtstat -A " + ip);  
-		           InputStreamReader ir = new InputStreamReader(p.getInputStream());  
-		           LineNumberReader input = new LineNumberReader(ir);  
-		           for (int i = 1; i < 100; i++) {  
-		               str = input.readLine();  
-		              if (str != null) {  
-		                   if (str.indexOf("MAC") > 1) {  
-		                       macAddress = str.substring(  
-		                                str.indexOf("MAC") + 9, str.length());  
-	                        break;  
-		                  }  
-		               }  
-		           }  
-	        } catch (IOException e) {  
-	            e.printStackTrace(System.out);  
-	        }  
-	        return macAddress;  
-		   } 
-    private void f(){}
-   
+
+	private String getMACAddress(String ip) {
+		        String str = "";
+		       String macAddress = "";
+		       try {
+		           Process p = Runtime.getRuntime().exec("nbtstat -A " + ip);
+		           InputStreamReader ir = new InputStreamReader(p.getInputStream());
+		           LineNumberReader input = new LineNumberReader(ir);
+		           for (int i = 1; i < 100; i++) {
+		               str = input.readLine();
+		              if (str != null) {
+		                   if (str.indexOf("MAC") > 1) {
+		                       macAddress = str.substring(
+		                                str.indexOf("MAC") + 9, str.length());
+	                        break;
+		                  }
+		               }
+		           }
+	        } catch (IOException e) {
+	            e.printStackTrace(System.out);
+	        }
+	        return macAddress;
+		   }
+    private void test1(){}
+
 
 
 }
