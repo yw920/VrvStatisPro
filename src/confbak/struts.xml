@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+	<package name="vrvssh" extends="struts-default" >
+		<global-results>
+			<result name="global">/index.jsp</result>
+		</global-results>
+
+		<action name="vrvRegisteredTerminalAction" class="RegisteredTerminalAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+		</action>
+		<action name="DomLoginTerminalAction" class="DomLoginTerminalAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+		</action>
+		<action name="vrvActiveStateAction" class="ActiveStateAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+		</action>
+		<action name="GetOrgListAction" class="GetOrgListAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+		</action>	
+		<action name="HeadquartersDisplayAction" class="HeadquartersDisplayAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+		</action>	
+		
+		<!--  wengjiang  -->
+		<action name="getDeviceHistoryInfoExcelAction" class="GetDeviceHistoryInfoExcelAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+		</action>	
+		<action name="getJustOneDeviceHistoryInfoExcelAction" class="GetJustOneDeviceHistoryInfoExcelAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+		</action>	
+		<!--  wengjiang  end -->
+	</package>
+</struts>    

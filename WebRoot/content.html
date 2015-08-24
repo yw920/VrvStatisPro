@@ -1,0 +1,395 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>分布式实时监控中心</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" type="text/css"
+	href="assets/easyui/themes/default/easyui.css">
+
+<link href="css/bootstrap.min.css" rel="stylesheet" type="text/css"
+	media="screen" />
+<link href="assets/styles/style.css" rel="stylesheet" />
+<link href="assets/css/retina.min.css" rel="stylesheet">
+<link href="assets/css/print.css" rel="stylesheet" type="text/css"
+	media="print" />
+<link href="assets/styles/color.css" rel="stylesheet" />
+<link href="assets/default.css" type="text/css" rel="stylesheet" />
+<link href="css/font-awesome.min.css" rel="stylesheet" type="text/css"
+	media="screen" />
+
+<link href="img/favicon/favicon.ico" rel="shortcut icon"
+	type="image/x-icon">
+<link href="img/favicon/favicon.ico" rel="icon" type="image/x-icon">
+<script>
+    function fDatareget(){
+        var xmlhttp;
+        if (window.XMLHttpRequest)
+         {// code for IE7+, Firefox, Chrome, Opera, Safari
+          xmlhttp=new XMLHttpRequest();
+         }
+        else
+         {// code for IE6, IE5
+          xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+         }
+        xmlhttp.onreadystatechange=function()
+        {
+            if(xmlhttp.readyState==4 && xmlhttp.status==200)
+              {
+              var result=xmlhttp.responseText;
+              //console.log("fDatareget:"+result.length);
+              //console.log(result);
+              if(result[0] == '0'){
+            	  alert("数据同步开始，请稍后检查结果！");
+              }else{
+            	  alert("数据同步失败["+result+"]");
+              }
+              }
+        };
+        //
+        var Url="/vrvstatispro/DataregetAction";
+        //Url = encodeURI(encodeURI(Url)); 
+        xmlhttp.open("POST",Url,false);
+        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        xmlhttp.send();
+    }
+    </script>
+</head>
+<body
+	style="min-width: 1200px;background:rgb(255, 255, 255);height:100% !important;width:100% !important;">
+
+	<div class="banner">
+		<img src="./img/logo2.png" alt="logo" width="500px"
+			style="margin-top:12px" />
+		<section id="navigation">
+			<nav id="nav-wrap">
+				<ul id="topnav" class="sf-menu">
+					<li id="maintab"><a href="#">数据服务监控</a>
+						<ul diplay=block class="test" style="max-width: 162px;">
+							<li><a href="#">首页</a></li>
+							<li><a href="#">设备详细信息</a></li>
+							<li><a href="#">日志信息</a></li>
+						</ul></li>
+					<li id="maintab"><a href="#">功能项设置</a>
+						<ul diplay=block class="test" style="max-width: 162px;">
+							<li><a href="#" onclick="getDropDown();$('#addUserModal').modal('show');">添加用户</a></li>
+							<li><a href="#"
+								onclick="$('#editPasswordModal').modal('show');">修改密码</a></li>
+							<li><a href="#" onclick="$('#dataReget').modal('show');">同步数据</a></li>
+							<li><a href="/vrvstatispro/UserExitAction">退出登录</a></li>
+						</ul></li>
+					<!--<li><a href="#">添加用户</a></li>
+                <li><a href="index.html">退出登录</a></li>
+                <li><a href="#">XXXXXXX</a></li>-->
+				</ul>
+			</nav>
+			<div class="navuserdiv">
+				<div class="user" style="color:white;">
+					<span class="hello">请退出</span>
+				</div>
+			</div>
+			<div class="clear"></div>
+		</section>
+	</div>
+
+	<div class="modal fade" id="addUserModal" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel">
+		<div class="modal-dialog" role="document" style="margin-top:200px;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel">添加操作员</h4>
+				</div>
+				<div class="modal-body">
+					<form>
+						<div class="form-group">
+							<label for="operName">操作员名称</label> <input type="text"
+								style="margin-top:10px" class="form-control" id="operName"
+								placeholder="请添加操作员名称">
+						</div>
+						<div class="dropdown" style="margin-top:20px">
+							<button id="dLabel" type="button" data-toggle="dropdown"
+								aria-haspopup="true" aria-expanded="false">
+								选择分公司名称<span class="caret"></span>
+							</button>
+							<ul id='myDropdownMenu' class="dropdown-menu"
+								aria-labelledby="dLabel">
+							</ul>
+						</div>
+
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="button" id="my" class="btn btn-primary"
+						onclick="comitNewUser()">确认</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="modal fade" id="editPasswordModal" tabindex="-1"
+		role="dialog" aria-labelledby="myModalLabel">
+		<div class="modal-dialog" role="document" style="margin-top:200px;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel1">用户密码修改</h4>
+				</div>
+				<div class="modal-body">
+					<form>
+						<div class="form-group">
+							<label for="operName">旧密码</label> <input type="password"
+								style="margin-top:10px" class="form-control" id="oldPassword"
+								placeholder="请输入旧密码">
+						</div>
+						<div class="form-group">
+							<label for="operOrg">新密码</label> <input type="password"
+								style="margin-top:10px" class="form-control" id="newPassword"
+								placeholder="请输入新密码">
+						</div>
+						<div class="form-group">
+							<label for="operOrg">确认新密码</label> <input type="password"
+								style="margin-top:10px" class="form-control" id="conNewPassword"
+								placeholder="请确认新密码">
+						</div>
+
+					</form>
+				</div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+					<button type="button" id="my" class="btn btn-primary"
+						onclick="comitNewPassword()">确认</button>
+				</div>
+			</div>
+		</div>
+	</div>
+
+
+	<div class="modal fade bs-example-modal-sm" id="alertAddSuc"
+		tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+		<div class="modal-dialog modal-sm"
+			style="width:120px;margin-top: 350px;">
+
+			<h2 class="center-block bg-success">新增成功！</h2>
+
+		</div>
+	</div>
+
+	<div class="modal fade bs-example-modal-sm" id="alertAddSuc1"
+		tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+		<div class="modal-dialog modal-sm"
+			style="width:120px;margin-top: 350px;">
+
+			<h2 class="center-block bg-danger">新增失败！</h2>
+
+		</div>
+	</div>
+	<div class="modal fade bs-example-modal-sm" id="alertEdit1"
+		tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+		<div class="modal-dialog modal-sm"
+			style="width:150px;margin-top: 350px;">
+
+			<h2 class="center-block bg-danger">密码不一致！！</h2>
+
+		</div>
+	</div>
+	<div class="modal fade bs-example-modal-sm" id="alertEdit2"
+		tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+		<div class="modal-dialog modal-sm"
+			style="width:120px;margin-top: 350px;">
+
+			<h2 class="center-block bg-success">修改成功！</h2>
+
+		</div>
+	</div>
+	<div class="modal fade bs-example-modal-sm" id="alertEdit3"
+		tabindex="-1" role="dialog" aria-labelledby="mySmallModalLabel">
+		<div class="modal-dialog modal-sm"
+			style="width:120px;margin-top: 350px;">
+
+			<h2 class="center-block bg-danger">修改失败！</h2>
+
+		</div>
+	</div>
+
+	<div class="modal fade" id="dataReget" tabindex="-1" role="dialog"
+		aria-labelledby="myModalLabel">
+		<div class="modal-dialog" role="document" style="margin-top:200px;">
+			<div class="modal-content">
+				<div class="modal-header">
+					<button type="button" class="close" data-dismiss="modal"
+						aria-label="Close">
+						<span aria-hidden="true">&times;</span>
+					</button>
+					<h4 class="modal-title" id="myModalLabel1">数据同步</h4>
+				</div>
+				<div class="modal-body">
+					<div class="form-group">
+						<label for="operName">该操作会同步后台各省的设备信息和机构信息，每天会定时同步一次，如果同步失败，可以通过该操作重新同步。是否继续？</label>
+					</div>
+				</div>
+				<div class="modal-footer">
+					<button type="button" id="my" class="btn btn-primary"
+						data-dismiss="modal" onclick="fDatareget();">继续</button>
+					<button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	
+	
+
+	<!--tab begin-->
+	<div style="margin:20px 0 10px 0;"></div>
+	<div id='tt' class="easyui-tabs"
+		style="width:100%;height:600px;opacity:1;"></div>
+	<script type="text/javascript" src="assets/network/asset/js/jquery.js"></script>
+	<script type="text/javascript" src="assets/easyui/jquery.min.js"></script>
+	<script type="text/javascript" src="assets/easyui/jquery.easyui.min.js"></script>
+	<script type="text/javascript" src="assets/js/tab.js"></script>
+	<script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+	<script>
+$(document).ready(function(){
+navClick("首页");
+});
+
+var global_GourpId;
+function comitNewUser(){
+	var oprName = $('#operName').val()
+	var oprGpId = global_GourpId  
+      var xmlhttp;
+      if (window.XMLHttpRequest)
+       {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+       }
+      else
+       {// code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+       }
+      xmlhttp.onreadystatechange=function()
+      {
+          if(xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+            var result=xmlhttp.responseText;
+          		if(result=="suscess"){
+					$('#alertAddSuc').modal('show')
+					setInterval(function(){
+						$('#alertAddSuc').modal('hide')
+					},1500)
+				
+          		}
+          		else {
+          			$('#alertAddSuc1').modal('show')
+					setInterval(function(){
+						$('#alertAddSuc1').modal('hide')
+					},1500)		
+          		}    		
+            }          
+      };
+      var Url="/vrvstatispro/AddUserAction?oprName="+oprName+"&oprGpId="+oprGpId;    
+      Url = encodeURI(encodeURI(Url));  
+      xmlhttp.open("POST",Url,false);
+      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      xmlhttp.send();
+    }
+function comitNewPassword(){
+	var oldPassword = $('#oldPassword').val()
+	var newPassword = $('#newPassword').val()
+	var conNewPassword = $('#conNewPassword').val()
+	if(newPassword!=conNewPassword){
+		$('#alertEdit1').modal('show')
+		setInterval(function(){
+			$('#alertEdit1').modal('hide')
+		},1500)		
+		
+		
+		return
+	}
+	
+      var xmlhttp;
+      if (window.XMLHttpRequest)
+       {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+       }
+      else
+       {// code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+       }
+      xmlhttp.onreadystatechange=function()
+      {
+          if(xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+            var result=xmlhttp.responseText;
+          		if(result=="success"){
+					$('#alertEdit2').modal('show')
+					setInterval(function(){
+						$('#alertEdit2').modal('hide')
+					},1500)
+				
+          		}
+          		else {
+          			$('#alertEdit3').modal('show')
+					setInterval(function(){
+						$('#alertEdit3').modal('hide')
+					},1500)		
+          		}    		
+            }          
+      };
+      var Url="/vrvstatispro/EditPasswordAction?oldPassword="+oldPassword+"&newPassword="+newPassword;    
+      Url = encodeURI(encodeURI(Url));  
+      xmlhttp.open("POST",Url,false);
+      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      xmlhttp.send();
+    }
+    
+ 
+function getDropDown(){    
+      var xmlhttp;
+      if (window.XMLHttpRequest)
+       {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+       }
+      else
+       {// code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+       }
+      xmlhttp.onreadystatechange=function()
+      {
+          if(xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+            var result=xmlhttp.responseText;
+           
+            $('#myDropdownMenu').html(result);		
+            }          
+      };
+      var Url="/vrvstatispro/GetTopOrgAction";    
+      Url = encodeURI(encodeURI(Url));  
+      xmlhttp.open("POST",Url,false);
+      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      xmlhttp.send();
+    }
+    
+
+	
+function myf(id){
+	global_GourpId = id;
+
+	var str = $('#'+id).text();
+	 str+= '<span class="caret"></span>'
+	 $('#dLabel').html(str);
+}
+
+
+    
+
+</script>
+</body>
+</html>

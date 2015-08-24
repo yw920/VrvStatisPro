@@ -1,0 +1,1624 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>分布式实时监控中心</title>
+<meta http-equiv="content-type" content="text/html;charset=utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1">
+
+<link href="assets/easyui/themes/default/easyui.css" rel="stylesheet"
+	type="text/css">
+
+<link href="assets/css/retina.min.css" rel="stylesheet">
+<link rel="stylesheet" href="assets/styles/color.css" />
+<link rel="stylesheet" href="assets/styles/all.css" />
+<link rel="stylesheet" type="text/css" media="screen"
+	href="assets/css/bootstrap.min.css">
+<link rel="stylesheet" href="assets/styles/style.css" />
+<link rel="stylesheet" type="text/css" media="screen"
+	href="assets/css/font-awesome.min.css">
+
+<link rel="stylesheet" type="text/css" media="screen"
+	href="assets/css/smartadmin-production.css">
+
+<link rel="shortcut icon" href="img/favicon/favicon.ico"
+	type="image/x-icon">
+<link rel="icon" href="img/favicon/favicon.ico" type="image/x-icon">
+
+<!--  用于时间选择    -->
+<script src="js/ForDepartmentActive/date.js"></script>
+<script src="js/ForDepartmentActive/date2.js"></script>
+<script>
+
+    function GetNowDate()  //今天
+	{  
+			  var myDate,myDateStr;  
+			  myDate = new Date();
+			  var yyyy = myDate.getFullYear();//取四位年份  		  
+			  var MM= myDate.getMonth()+1;//取月份
+			  if(MM<10)
+			  {
+			  	MM="0"+MM;
+			  }  
+			  var dd= myDate.getDate();//取日  
+			  if(dd<10)
+			  {
+			  	dd="0"+dd;
+			  } 
+			  myDateStr=yyyy+"-"+MM+"-"+dd;
+			  return myDateStr;  
+	}
+    function GetLastDate()  //最近
+	{  
+			  var myDate,myDateStr;  
+			  myDate = new Date(new Date()-1000*60*60*24*30);
+			  var yyyy = myDate.getFullYear();//取四位年份  		  
+			  var MM= myDate.getMonth()+1;//取月份
+			  if(MM<10)
+			  {
+			  	MM="0"+MM;
+			  }  
+			  var dd= myDate.getDate();//取日  
+			  if(dd<10)
+			  {
+			  	dd="0"+dd;
+			  } 
+			  myDateStr=yyyy+"-"+MM+"-"+dd;
+			  return myDateStr;  
+	}
+	
+    function GetLastMonthDate()  //默认最近一个月
+	{  
+			  var myDate,myDateStr;  
+			  
+              myDate=new Date();
+			  var yyyy = myDate.getFullYear();//取四位年份  		  
+			  var MM= myDate.getMonth();//取月份
+			  if(MM<10)
+			  {
+			  	MM="0"+MM;
+			  }  
+			  var dd= myDate.getDate();//取日  
+			  if(dd<10)
+			  {
+			  	dd="0"+dd;
+			  } 
+			  myDateStr=yyyy+"-"+MM+"-"+dd;
+			  return myDateStr;  
+	}
+	
+	      var NowDate = GetNowDate();
+	      var NowDatetime = NowDate + " 23:59:59";
+	      var LastMonthDate = GetLastMonthDate();
+	      var LastMonthDatetime = LastMonthDate + " 23:59:59";
+	      console.log("NowDatetime:"+ LastMonthDatetime + " vs " + NowDatetime);
+</script>
+
+
+
+<style type="text/css">
+body {
+	overflow: auto
+}
+
+.label-important {
+	background: #ff5454;
+}
+
+.fa-white {
+	color: #fff;
+}
+
+.label {
+	font-weight: inherit;
+}
+
+.fenye {
+	height: 50px;
+	border: #000 1px solid;
+}
+
+.newpage a {
+	color: #000;
+}
+
+.out {
+	border-top: 59px #FF5511 solid; /*上边框宽度等于表格第一行行高*/
+	width: 0px; /*让容器宽度为0*/
+	height: 0px; /*让容器高度为0*/
+	border-right: 123px #FF9900 solid; /*左边框宽度等于表格第一行第一格宽度*/
+	position: relative; /*让里面的两个子容器绝对定位*/
+}
+
+.fen {
+	border-top: 59px #008080 solid; /*上边框宽度等于表格第一行行高*/
+	width: 0px; /*让容器宽度为0*/
+	height: 0px; /*让容器高度为0*/
+	border-right: 123px #556B2F solid; /*左边框宽度等于表格第一行第一格宽度*/
+	position: relative; /*让里面的两个子容器绝对定位*/
+}
+
+.in {
+	border-top: 59px #808000 solid; /*上边框宽度等于表格第一行行高*/
+	width: 0px; /*让容器宽度为0*/
+	height: 0px; /*让容器高度为0*/
+	border-right: 123px #2F4F4F solid; /*左边框宽度等于表格第一行第一格宽度*/
+	position: relative; /*让里面的两个子容器绝对定位*/
+}
+
+.pri {
+	border-top: 59px #C0C0C0 solid; /*上边框宽度等于表格第一行行高*/
+	width: 0px; /*让容器宽度为0*/
+	height: 0px; /*让容器高度为0*/
+	border-right: 123px #808080 solid; /*左边框宽度等于表格第一行第一格宽度*/
+	position: relative; /*让里面的两个子容器绝对定位*/
+}
+
+b {
+	font-style: normal;
+	display: block;
+	position: absolute;
+}
+
+em {
+	font-style: normal;
+	display: block;
+	position: absolute;
+}
+</style>
+
+</head>
+<body
+	style="min-width: 1200px; height:100%;background:#e9ebec;min-height:519px;overflow:hidden;">
+	<div class="easyui-layout" style="width:100%;height:100%;opacity:1;">
+		<div data-options="region:'center'" style="width:70% !important;">
+			<div class="easyui-layout" data-options="fit:true">
+				<div data-options="region:'north',split:true,border:false"
+					style="border-bottom: #000000 1px solid;margin-top:-25px;height:554px;overflow:hidden;">
+					<div id="graphic" class="span8"
+						style="width:100% !important;height:100%">
+
+						<div class="row">
+							<div class="col-lg-12">
+								<div class="box" style="margin:0 30px 0 10px;">
+									<div class="box-header" data-original-title>
+										<h2>
+											<i class="fa fa-user"></i><span class="break"></span>用户设备活动状态的信息
+										</h2>
+
+										<span style="font-weight:bold;">请输入要查询的时间范围：</span> <b> </b> <br>
+										<!--     起始时间：  <input type="text" name="txt2"  onfocus="c.showMoreDay = false;willBeChangVar='globleStrStartTime';c.show(this);" onpropertychange="alert(this.value);" />
+                              	    结束时间：  <input type="text" name="txt2"  onfocus="c.showMoreDay = false;willBeChangVar='globleStrEndTime';c.show(this);"  />
+            	                  -->
+										起始时间： <input type="text" name="btntxt" id="btntxt"
+											readonly="true " /><input name="button"
+											value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;" id="button"
+											type="button"
+											onclick="c.showMoreDay = true;willBeChangVar='globleStrStartTime';c.show(getObjById('btntxt'),this,GetNowDate())"
+											style="background:url(image/date.jpg) no-repeat;   " />
+										&nbsp;&nbsp;&nbsp;&nbsp; 结束时间：<input type="text"
+											name="btntxt1" id="btntxt1" readonly="true " /><input
+											name="button1" value="&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
+											id="button1" type="button"
+											onclick="c.showMoreDay = true;willBeChangVar='globleStrEndTime';c.show(getObjById('btntxt1'),this,GetLastDate())"
+											style="background:url(image/date.jpg) no-repeat;   " /> <br>
+										<br>
+
+										<script>
+                                //刷新 提交表单的内部的时间范围 这个函数在 date。js中得到调用
+                                function refreshTime()
+                                { 
+                                    document.getElementById("strStartTime").value=globleStrStartTime;
+                                    document.getElementById("strEndTime").value=globleStrEndTime;
+                                }       
+</script>
+										</head>
+										<body>
+									</div>
+									<div class="box-content">
+										<form id='excelForm' method='get'>
+											<table id="deviceInfoTable"
+												class="table table-striped table-bordered bootstrap-datatable datatable newpage-table">
+												<thead>
+													<tr>
+														<td>Mac</td>
+														<td>设备编码</td>
+														<td>使用人</td>
+														<td>部门信息</td>
+														<td>组织机构编码</td>
+														<td>上次登录时间</td>
+														<td>登录次数</td>
+														<!--<td><input type="button" id="selectAllOrNo"
+															value="全选 "> <input type="button"
+															id="selectOther" value="反选"></td>-->
+
+													</tr>
+												</thead>
+
+												<tbody id="main_table01" class="newpage-tbody">
+												</tbody>
+
+											</table>
+											<div class="pagination pagination-centered newpage"
+												style="float:right;margin:0 0 10px 0;">
+
+												<!--<input id="Button1" type="" value="导出当前页面全部的EXCEL"
+													onclick="javascript:method1('deviceInfoTable')" />-->
+
+											</div>
+
+											<input type="text" id="strStartTime" style="display:none;"
+												value="2013-03-03 17:23:07" name="strStartTime"> <input
+												type="text" id="strEndTime" style="display:none;"
+												value="2016-03-20 11:34:30" name="strEndTime"> <input
+												type="text" id="strOfficeName" style="display:none;"
+												value="保险股份有" name="strOfficeName">
+										</form>
+										<input id="Button1" type="button" value="导出当前页面全部的EXCEL"
+											onclick="javascript:method1('deviceInfoTable')" />
+
+
+
+
+
+
+
+
+
+										<!--    
+   <form id="excelForm" method="post">
+     
+	    <a href="javascript:void(0)" onclick="formSubmit('read')">Read excel 2003 or 2007</a><br><br>
+	    <a href="javascript:void(0)" onclick="formSubmit('export')">Export excel 2003</a><br><br>
+	    <a href="javascript:void(0)" onclick="formSubmit('export2007')">Export excel 2007</a><br><br>
+	    <a href="javascript:void(0)" onclick="formSubmit('replace')">Export excel by templates,replace a cell</a><br><br>
+	    <a href="javascript:void(0)" onclick="formSubmit('template')">Export excel by templates,insert a table</a><br><br>
+	 
+    </form>
+       -->
+
+										<!--<input id="Button1" type="button" value="导出该部门的被选中设备的信息到EXCEL"
+											onclick="javascript:getAllDeviceInfoOfAnyDepartment('deviceInfoTable')" />-->
+
+
+
+
+
+
+										<!-- 
+
+
+普通调用:<input type="text" name="txt"  onfocus="c.showMoreDay = true;c.show(this,'1980-01-01');"/><input type="text" name="txt1"  onfocus="c.showMoreDay = false;c.show('1981-01-01',this);"/><input type="text" name="txt2"  onfocus="c.showMoreDay = false;c.show(this);"/>
+<div style="height:3000px"></div>
+
+ 
+ 按钮调用:<input type="text" name="btntxt" id="btntxt" /><input name="button" value="*" id="button" type="button" onclick="c.showMoreDay = true;c.show(getObjById('btntxt'),'1982-1-1',this)"/> <input type="text" name="btntxt1" id="btntxt1" /><input name="button1"  value="*"  id="button1" type="button" onclick="c.showMoreDay = true;c.show(getObjById('btntxt1'),this,'1983-1-1')"/>
+ 
+   <input type="text" name="btntxt3" id="btntxt3" /><input name="button3" value="*"  id="button3" type="button" onclick="c.showMoreDay = true;c.show(this,getObjById('btntxt3'))"/></form>
+ -->
+
+
+
+
+
+
+
+										<script>
+         var globleTagOfDepartmennt="中国人民财产保险股份有限公司";  //这个变量的初始 会在 ajax获取前台数据的时候 更新      前台数据的更新是左边的树点击触发的   它的最开始的默认值也是1 表示根节点      所以在树点击事件中去跟新                 这个定义全局变量    用来标示部门信息 暂时是部门名字  下一步会改变为部门编号
+         function getAllDeviceInfoOfAnyDepartment(){
+        	  var postForm = document.getElementById("excelForm"); 
+        	    //alert(globleTagOfDepartmennt);
+        	    document.getElementById("strOfficeName").value=encodeURI(globleTagOfDepartmennt);
+        	    
+        	    var Url ="getDeviceHistoryInfoExcelAction.action";//  ?&strEndTime=2015-03-20 11:34:30&strStartTime=2015-03-03 17:23:07&strOfficeName='asdsad'";  //globleTagOfDepartmennt+"'";
+        	    //var Url ="getDeviceHistoryInfoExcelAction.action";
+        		
+        	    Url = encodeURI(Url);
+        	    //alert(Url);
+        		postForm.action = Url;
+        		postForm.submit();
+          }
+          
+      
+        </script>
+									</div>
+								</div>
+							</div>
+							<!--/col-->
+						</div>
+						<!--/row-->
+					</div>
+				</div>
+
+				<script>
+
+
+//为了传递用户选择的
+
+
+ //反选 表单内的内容
+	  		     /*document.getElementById("selectOther").onclick=function(){ 
+	  		  	   var a = document.getElementsByTagName("input"); 
+	  		  	   for (var i=0; i<a.length; i++) 
+	  		  	      if (a[i].type == "checkbox") a[i].checked =!a[i].checked; 
+	  		  	  };*/
+
+	  		  //反选 表单内的内容
+	  		       /*document.getElementById("selectAllOrNo").onclick=function(){ 
+	  		      	   var a = document.getElementsByTagName("input"); 
+	  		      	   if(a[6].checked==true){
+	  		      	   for (var i=0; i<a.length; i++) 
+	  		      	      if (a[i].type == "checkbox") a[i].checked = false; 
+	  		      	   } 
+	  		      	   else 
+	  		      	   { 
+	  		      	   for (var i=0; i<a.length; i++) 
+	  		      	      if (a[i].type == "checkbox") a[i].checked = true; 
+	  		      	   } 
+	  		      	};  */
+
+/*function selectAllForForm() 
+{ 
+   var a = document.getElementsByTagName("input"); 
+   for (var i=0; i<a.length; i++) 
+      if (a[i].type == "checkbox") a[i].checked =!a[i].checked; 
+  } 
+*/
+
+
+
+/*function checkbox()
+{
+var str=document.getElementsByName("box");
+var objarray=str.length;
+var chestr="";
+for (i=0;i<objarray;i++)
+{
+  if(str[i].checked == true)
+  {
+   chestr+=str[i].value+",";
+  }
+}
+if(chestr == "")
+{
+  alert("请先选择复选框～！");
+}
+else
+{
+  alert("复选框的值是："+chestr);
+}
+}*/
+</script>
+
+
+
+				<div data-options="region:'west',split:true,border:false"
+					style="width:0%;overflow:hidden;">
+					<div class="row" style="width:100%;height:auto;">
+						<div
+							style="background:rgb(247,247,248);border:#ccc 1px solid;background-size:cover;width:100%;margin-bottom:1px;height:49px;float:left;">
+							<p id="z1"
+								style="color: #000;font-size: 15px;left:6px;text-align:center;margin-top:11px;font-weight: bold;">
+								该部门历史统计信息</p>
+						</div>
+						<article>
+							<div class="jarviswidget" id="wid-id-7"
+								data-widget-editbutton="false">
+								<div style="height:270px;padding:0;">
+									<div class="widget-body no-padding">
+										<div id="site-stats" class="chart has-legend"
+											style="top:-22px;background: #fbfbfb;"></div>
+									</div>
+								</div>
+							</div>
+						</article>
+					</div>
+				</div>
+				<div data-options="region:'east',split:true,border:false"
+					style="width:100%;overflow:hidden;">
+					<!-- row -->
+					<div class="row" style="width:100%;">
+						<div
+							style="background:rgb(247,247,248);border:#ccc 1px solid;background-size:cover;width:100%;margin-bottom:1px;height:49px;float:left;">
+							<p
+								style="color: #000;font-size: 15px;left:6px;text-align:center;margin-top:11px;font-weight: bold;">
+								所有子部门历史信息</p>
+						</div>
+						<!-- NEW WIDGET START -->
+						<article>
+							<div class="jarviswidget" id="wid-id-6"
+								data-widget-editbutton="false" style="height:296px; ">
+								<div style="height:270px">
+									<div class="widget-body no-padding">
+										<div id="bar-chart" class="chart"
+											style="top:-14px;background: #fbfbfb;padding-right:150px;padding-left:30px"></div>
+									</div>
+								</div>
+							</div>
+						</article>
+					</div>
+					<!-- end row -->
+				</div>
+			</div>
+		</div>
+		<div data-options="region:'west',split:true"
+			style="padding:10px;width:16%;height:400px;border-right: #000000 1px solid;">
+			<h2></h2>
+			<div style="margin:20px 0;"></div>
+			<div class="easyui-panel" style="padding:5px;width:100%;">
+				<ul id="ttlist" class="easyui-tree">
+				</ul>
+			</div>
+		</div>
+		<div data-options="region:'east',split:true"
+			style="width:15%;height:400px;border-left: #000000 1px solid;">
+			<div class="data-tree-2" id="data-network">
+				<div class="center-service"
+					style="margin:15px 5px 0 0;padding-left:0;height:292px; width:270px;border-radius:0 0 5px 5px;display: block;">
+					<div class="box-content" style="height:276px;">
+						<table
+							class="table table-striped table-bordered bootstrap-datatable datatable newpage-table"
+							style="height:276px;">
+							<thead>
+								<tr style="height: 38px;">
+									<th colspan="2" text-align="center" valign="middle"
+										style="font-size:18px;background-color: #808080;color:#FFFFFF;">总部图形化模块展示</th>
+								</tr>
+							</thead>
+							<tbody>
+								<tr
+									style="background-color: #FF9900;color:#FFFFFF;font-weight:bold;vertical-align: middle;">
+									<td
+										style="background-color: #FF9900;vertical-align: middle;text-align: center;width:145px;">未注册设备</td>
+									<td
+										style="border-spacing: 0px;vertical-align: middle;text-align: center;height:59px;padding:0px;"><div
+											class="out">
+											<b id="bChart01" style="top:-34px;left:79px;">总25755</b> <em
+												id="emChart01" style="top:-53px;left:6px;">120</em>
+										</div></td>
+
+								</tr>
+								<tr
+									style="background-color: #556B2F;color:#FFFFFF;font-weight:bold;vertical-align: middle;">
+									<td style="vertical-align: middle;text-align: center;">一个月未活动设备</td>
+									<td
+										style="vertical-align: middle;text-align: center;height:59px;padding:0px;"><div
+											class="fen">
+											<b id="bChart02" style="top:-34px;left:79px;">总25755</b> <em
+												id="emChart02" style="top:-53px;left:6px;">588</em>
+										</div></td>
+
+								</tr>
+								<tr
+									style="background-color: #2F4F4F;color:#FFFFFF;font-weight:bold;vertical-align: middle;">
+									<td
+										style="background-color: #2F4F4F;vertical-align: middle;text-align: center;">未入域设备</td>
+									<td
+										style="background-color: #2F4F4F;vertical-align: middle;text-align: center;height:59px;padding:0px;"><div
+											class="in">
+											<b id="bChart03" style="top:-34px;left:79px;">总25755</b> <em
+												id="emChart03" style="top:-53px;left:6px;">865</em>
+										</div></td>
+
+								</tr>
+								<tr
+									style="background-color: #808080;color:#FFFFFF;font-weight:bold;vertical-align: middle;">
+									<td style="vertical-align: middle;text-align: center;">活动设备分布</td>
+									<td
+										style="vertical-align: middle;text-align: center;height:59px;padding:0px;"><div
+											class="pri">
+											<b id="bChart04" style="top:-34px;left:79px;">外2755</b> <em
+												id="emChart04" style="top:-53px;left:6px;">23685内</em>
+										</div></td>
+
+								</tr>
+
+							</tbody>
+						</table>
+					</div>
+				</div>
+				<div
+					style="width:10%;height:530px;margin-top:7px;float:left;background: url(img/guzhang.png);">
+					<div
+						style="color:#000000; line-height:20px;padding-top:138px;padding-left:5px;font-weight: bold;">日志信息</div>
+					<img src="img/zuixiaohua.png" alt
+						style="margin-top:248px;margin-left:30%"> <img
+						src="img/zuidahua.png" alt=""> <img src="img/youjiao.png"
+						alt="">
+				</div>
+				<div class="jarviswidget jarviswidget-color-blueDark" id="wid-id-0"
+					data-widget-editbutton="false"
+					style="background:#e9ebec;width:90%;height:545px;top:5px;float:right;">
+					<div style="height:532px;width:242px;">
+						<div class="widget-body"
+							style="height:360px;width:239px !important;">
+							<table class="table table-bordered" id="addtbody"
+								style="height:350px;width:239px !important;border-collapse: collapse;color: #333;word-break:break-all;">
+								<thead>
+									<tr>
+										<th style="text-align:center;">时间</th>
+										<th style="text-align:center;width:100px;">类型</th>
+									</tr>
+								</thead>
+								<tbody id="loginfo01">
+									<!--<tr>
+										<td>2012/02/01</td>
+										<td>成功</td>
+									</tr>-->
+								</tbody>
+							</table>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<!--  用于弹窗提示  效果  -->
+	<style>
+.black_overlay {
+	display: none;
+	position: absolute;
+	top: 0%;
+	left: 0%;
+	width: 100%;
+	height: 100%;
+	background-color: black;
+	z-index: 1001;
+	-moz-opacity: 0.8;
+	opacity: .30;
+	filter: alpha(opacity = 30);
+}
+
+.white_content {
+	display: none;
+	position: absolute;
+	top: 25%;
+	left: 25%;
+	width: 50%;
+	height: 50%;
+	padding: 16px;
+	border: 16px solid orange;
+	background-color: white;
+	z-index: 1002;
+	overflow: auto;
+}
+
+.lookupDeviceHistoryWordsTagsStyle:hover {
+	background-color: Green;
+	color: #FFF;
+	font-size: 12px;
+}
+</style>
+</head>
+
+
+<script type="text/javascript">
+ 
+var  globleDeviceId=1; //这个变量会在 用户点击  设备   查看详情   的时候更新  如果没有那么就说明那边有问题了  
+var  globleStrStartTime=LastMonthDatetime; //这个变量会在 用户 选择时间的时候   的时候更新  
+var  globleStrEndTime=NowDatetime; //这个变量会在 用户点  选择时间的时候   的时候更新   
+/*function creatExcelForDevice(){
+	//获取<a>标签对象  
+	var a = document.getElementById("creatExcelForOneDecice" );  
+	//指定<a>标签的href  
+	a.href = "getJustOneDeviceHistoryInfoExcelAction.action?strStartTime="+globleStrStartTime+"&strEndTime="+globleStrEndTime+"&deviceId="+globleDeviceId;  
+	//取消<a>标签原先的onclick事件,使<a>标签点击后通过href跳转(因为无法用js跳转)^-^  
+	a.setAttribute("onclick",'');  
+	//激发标签点击事件OVER  
+	a.click("return false"); 
+	a.setAttribute("onclick","creatExcelForDevice()");  
+}*/
+ 
+</script>
+
+
+
+<!--<div id="light" style="text-align:right" class="white_content">
+
+	<a id="creatExcelForOneDecice"
+		href="getJustOneDeviceHistoryInfoExcelAction.action?strStartTime=123&strEndTime=123456&deviceId=2002454044"
+		onclick="creatExcelForDevice()">将该设备信息导入到Excel文件中 </a>
+	&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; <a href="javascript:void(0)"
+		onclick="document.getElementById('light').style.display='none';document.getElementById('fade').style.display='none'">关闭
+	</a>
+
+	<div id=divForDeviceHistoryInfo class="chart"
+		style="top:-14px;background: #fbfbfb;padding-right:10px;padding-left:10px"></div>
+
+</div>-->
+<!--  用于背景的遮罩  效果  -->
+<div id="fade" class="black_overlay">
+	<!--  用于弹窗提示  效果   结束 -->
+
+
+
+	<script type="text/javascript" src="assets/easyui/jquery.min.js"></script>
+	<script type="text/javascript" src="assets/easyui/jquery.easyui.min.js"></script>
+	<script src="js/bootstrap/bootstrap.min.js"></script>
+	<script src="js/app.js"></script>
+	<script type="text/javascript" src="assets/js/echarts-all.js"></script>
+
+	<script src="assets/js/custom.min.js"></script>
+	<script src="assets/js/core.min.js"></script>
+
+	<script src="assets/js/jquery.nestable.min.js"></script>
+	<script src="assets/js/pages/ui-nestable-list.js"></script>
+
+	<script src="assets/js/jquery.sparkline.min.js"></script>
+	<script src="assets/js/jquery.dataTables.min.js"></script>
+	<script src="assets/js/dataTables.bootstrap.min.js"></script>
+	<script src="assets/js/pages/table.js"></script>
+
+
+	<script>
+  var mper = 1;
+  var nper = 0;
+  var allper = 1;
+  var orgname;
+  var orgnum;
+  
+  function AfterLoadShow(){
+  	delSpanTree();
+  	delSpanAsName();
+  }
+  function delSpanTree(){
+  	//alert("delSpanTree");
+  	var nodelist = document.getElementsByClassName("tree-indent");
+  	var node = nodelist[0];
+  	//alert(nodelist.length);
+  	for(var i=nodelist.length-1;i>=0;i--)
+  	{
+  		node = nodelist[i];
+  		node.parentNode.removeChild(node);
+  		//alert(i);
+  	}
+  }
+  function delSpanAsName(){
+  	//alert("delSpanAsName");
+  	var nodelist = document.getElementsByClassName("tree-title");
+  	var node = nodelist[0];
+  	//alert(nodelist.length);
+  	for(var i=nodelist.length-1;i>=0;i--)
+  	{
+  		node = nodelist[i];
+  		var ChildNodes = node.childNodes;
+  		var ParentNode = node.parentNode;
+  		ParentNode.removeChild(node);
+  		ParentNode.appendChild(ChildNodes[0]);
+  		
+  		//alert(i);
+  	}
+  }
+  
+  //这里是曹宇写的  是通过后台取得所有的树的内容  树的html是后台生成的     他的点击事件也是在后台定义好的 
+  function getOrgListContent()
+    {
+      
+      var xmlhttp;
+      if (window.XMLHttpRequest)
+       {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+       }
+      else
+       {// code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+       }
+      xmlhttp.onreadystatechange=function()
+      {
+          if(xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+            var result=xmlhttp.responseText;
+            //alert(result);
+            $("#ttlist").html(result);
+            AfterLoadShow();
+            }
+      };
+      //
+      var Url="/vrvstatispro/GetOrgListAction?OrgAction=1";
+      //Url = encodeURI(encodeURI(Url)); 
+      xmlhttp.open("POST",Url,false);
+      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      xmlhttp.send();
+    }
+  
+    function getLoginfo()
+    {
+      
+      var xmlhttp;
+      if (window.XMLHttpRequest)
+       {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+       }
+      else
+       {// code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+       }
+      xmlhttp.onreadystatechange=function()
+      {
+          if(xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+            var result=xmlhttp.responseText;
+            //alert(result);
+            $("#loginfo01").html(result);
+            //AfterLoadShow();
+            }
+      };
+      //
+      var Url="/vrvstatispro/LoginfoAction";
+      //Url = encodeURI(encodeURI(Url));
+      xmlhttp.open("POST",Url,false);
+      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      xmlhttp.send();
+    }
+    
+	function getStatisContent(item,OrgName,OrgId)
+    {
+	
+		 
+		
+	    //getHistoryData(3,"2014-07-31 15:00:17","2015-04-13 09:29:31",274);
+	    	  
+      var xmlhttp;
+      if (window.XMLHttpRequest)
+       {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+       }
+      else
+       {// code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+       }
+      xmlhttp.onreadystatechange=function()
+      {
+          if(xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+            var result=xmlhttp.responseText;
+            //alert(result);
+            var jsonobj = eval('('+result+')');
+            //alert(jsonobj.code);
+           // alert(jsonobj.IsLastPage);
+            var subJsonobj1=eval(jsonobj.return);
+            mper = eval(jsonobj.IsLogin);
+            nper = eval(jsonobj.NoLogin);
+            allper = eval(jsonobj.All);
+            orgname = eval(jsonobj.orgname);
+            orgnum = eval(jsonobj.orgnum);
+            //alert(subJsonobj1[0].f2);
+            var main_table01="<tr></tr>  ";
+            //alert(subJsonobj1.length);
+               if(subJsonobj1.length>0){
+            	   for(var i = 0;i<subJsonobj1.length;i++){
+               		/*main_table01 += "   <tr>"+
+                                  "    <td>"+subJsonobj1[i].f7+"</td> "+
+                                  "    <td>"+subJsonobj1[i].f2+"</td> "+
+                                  "    <td>"+subJsonobj1[i].f3+"</td> "+
+                                  "    <td>"+subJsonobj1[i].f8+"</td> "+
+                                  "    <td>"+subJsonobj1[i].f9+"</td> "+
+                                  "    <td>"+subJsonobj1[i].f36+"</td>"+
+   		                       "    <td>"+subJsonobj1[i].ActDays+"</td>"+
+   		                       "    <td>"+ "<a href='#'  onclick='lookUpDetailOfDevice("+subJsonobj1[i].f2+")'  style='cursor:hand' class='lookupDeviceHistoryWordsTagsStyle'  >   历史记录  " +" </a></td>"+
+   		                       "    <td> <input name='deviceId' type='checkbox' value='"+subJsonobj1[i].f2+"'/>"+"</td>"+
+   		                      
+   			                       "</tr>";*/
+   			        main_table01 += "   <tr>"+
+                                  "    <td>"+subJsonobj1[i].f7+"</td> "+
+                                  "    <td>"+subJsonobj1[i].f2+"</td> "+
+                                  "    <td>"+subJsonobj1[i].f3+"</td> "+
+                                  "    <td>"+subJsonobj1[i].f8+"</td> "+
+                                  "    <td>"+subJsonobj1[i].f9+"</td> "+
+                                  "    <td>"+subJsonobj1[i].f36+"</td>"+
+   		                       "    <td>"+subJsonobj1[i].ActDays+"</td>"
+   			                       "</tr>";
+   			                       
+              	   }
+                   //main_table01 += "   <input type='submit' name='Submit' value='提交' align='right'>            <input id='Button1' type='button' value='轉出EXCEL'   onclick='javascript:method1('\'deviceInfoTable\'')' />"
+                  //alert(main_table01); 
+               }else{
+            	   main_table01 += "   <tr>  <th  colspan='8'  style='   text-align:center;color:red;' >系统中没有该部门的设备信息</th> </tr> ";
+                      
+               }
+           
+           
+            $("#main_table01").html(main_table01);
+            fenye();
+            }
+          
+
+  		//by  wengjiang  这里是实现
+  	  refreshBottonMap(8,globleStrStartTime,globleStrEndTime,OrgId);//!!!//
+  	  globleTagOfDepartmennt=OrgName;//这里跟新全局的部门标示  
+  		//by wengjiang  end     
+  		
+      };
+      var Url="vrvstatispro/vrvActiveStateAction?iFunc=1&strStartTime="+globleStrStartTime+"&strEndTime="+globleStrEndTime+"&strOfficeName="+OrgName+"&officeID="+OrgId;
+      
+      Url = encodeURI(encodeURI(Url));
+      console.log("vrvActiveStateAction:");
+      console.log(Url);
+      
+      xmlhttp.open("POST",Url,false);
+      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      xmlhttp.send();
+    }
+	
+	
+	//实现生成excle   暂时没用   
+	 
+        var idTmr;
+		function  getExplorer() {
+			var explorer = window.navigator.userAgent ;
+			//ie 
+			if (explorer.indexOf("MSIE") >= 0) {
+				return 'ie';
+			}
+			//firefox 
+			else if (explorer.indexOf("Firefox") >= 0) {
+				return 'Firefox';
+			}
+			//Chrome
+			else if(explorer.indexOf("Chrome") >= 0){
+				return 'Chrome';
+			}
+			//Opera
+			else if(explorer.indexOf("Opera") >= 0){
+				return 'Opera';
+			}
+			//Safari
+			else if(explorer.indexOf("Safari") >= 0){
+				return 'Safari';
+			}
+		}
+        function method1(tableid) {//整个表格拷贝到EXCEL中
+			if(getExplorer()=='ie')
+			{
+				var curTbl = document.getElementById(tableid);
+				var oXL = new ActiveXObject("Excel.Application");
+				
+				//创建AX对象excel 
+				var oWB = oXL.Workbooks.Add();
+				//获取workbook对象 
+				var xlsheet = oWB.Worksheets(1);
+				//激活当前sheet 
+				var sel = document.body.createTextRange();
+				sel.moveToElementText(curTbl);
+				//把表格中的内容移到TextRange中 
+				sel.select();
+				//全选TextRange中内容 
+				sel.execCommand("Copy");
+				//复制TextRange中内容  
+				xlsheet.Paste();
+				//粘贴到活动的EXCEL中       
+				oXL.Visible = true;
+				//设置excel可见属性
+
+				try {
+					var fname = oXL.Application.GetSaveAsFilename("Excel.xls", "Excel Spreadsheets (*.xls), *.xls");
+				} catch (e) {
+					print("Nested catch caught " + e);
+				} finally {
+					oWB.SaveAs(fname);
+
+					oWB.Close(savechanges = false);
+					//xls.visible = false;
+					oXL.Quit();
+					oXL = null;
+					//结束excel进程，退出完成
+					//window.setInterval("Cleanup();",1);
+					idTmr = window.setInterval("Cleanup();", 1); 
+				} 
+			}
+			else
+			{
+				tableToExcel(tableid)
+			}
+        }
+        function Cleanup() {
+            window.clearInterval(idTmr);
+            CollectGarbage();
+        }
+		var tableToExcel = (function() {
+			  var uri = 'data:application/vnd.ms-excel;base64,',
+			  template = '<html xmlns:o="urn:schemas-microsoft-com:office:office" xmlns:x="urn:schemas-microsoft-com:office:excel" xmlns="http://www.w3.org/TR/REC-html40"><head><!--[if gte mso 9]><xml><x:ExcelWorkbook><x:ExcelWorksheets><x:ExcelWorksheet><x:Name>{worksheet}</x:Name><x:WorksheetOptions><x:DisplayGridlines/></x:WorksheetOptions></x:ExcelWorksheet></x:ExcelWorksheets></x:ExcelWorkbook></xml><![endif]--></head><body><table>{table}</table></body></html>',
+				base64 = function(s) { return window.btoa(unescape(encodeURIComponent(s))) },
+				format = function(s, c) {
+					return s.replace(/{(\w+)}/g,
+					function(m, p) { return c[p]; }) }
+				return function(table, name) {
+				if (!table.nodeType) table = document.getElementById(table)
+				var ctx = {worksheet: name || 'Worksheet', table: table.innerHTML}
+				window.location.href = uri + base64(format(template, ctx))
+			  }
+			})()
+	// 生成excel结束 
+	 
+	 
+	//实现浮层弹窗提示效果   设备历史信息  
+	function lookUpDetailOfDevice(deviceId ){
+		document.getElementById('light').style.display='block';
+		document.getElementById('fade').style.display='block';
+		globleDeviceId=deviceId;//这里更新设备Id 主要是为了让保存为Excel的时候 可以直接把这个参数传到后台取到该Id的设备的信息
+		refreshDeviceHistoryInfoMap(6,globleStrStartTime,globleStrEndTime,deviceId);
+	}//实现浮层弹窗提示效果   设备历史信息  
+	function refreshDeviceHistoryInfoMap(iFunc,strStartTime,strEndTime,deviceId)
+    { 	//divForDeviceHistoryInfo 
+ 
+	    var  dataMastersNames = new  Array(); //记录 部门信息的数组
+	     
+	    var everyOneDatas=  new Array();  // 记录每个部门的具体数据
+	   
+	 
+	    var xAxisTag  = new Array();  // 记录X轴上的日期
+	     
+	 
+	    var depNum=0;  //记录设备的数目  实际上只有一台    因为是借用部门子部门的统计信息
+ 
+	  var xmlhttp;
+	  if (window.XMLHttpRequest)
+	   {// code for IE7+, Firefox, Chrome, Opera, Safari
+	    xmlhttp=new XMLHttpRequest();
+	   }
+	  else
+	   {// code for IE6, IE5
+	    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+	   }
+	  xmlhttp.onreadystatechange=function()
+	  {
+	      if(xmlhttp.readyState==4 && xmlhttp.status==200)
+	        { 
+	        var result=xmlhttp.responseText; 
+	          
+	         var jsonobj = eval('('+result+')');
+	         var depJsonArray=eval(jsonobj.departments); 
+			 depNum=depJsonArray.length; 
+			//初始化 部门信息和每个部门的历史记录信息保存到 everyOneDatas（每个对象的历史的买一天的数据 哈希数组）    需要把部门的名字都取过来保存  <depJsonArray.length 就是部门的数量 
+	          
+			dataMastersNames.splice(0,dataMastersNames.length);
+			// alert(" alert(dataMastersNames.length);"+dataMastersNames.length);
+			for(var ii=0;ii<depNum;ii++){
+	        	
+				dataMastersNames[ii]=depJsonArray[ii].depName;// 把真实的数据存放到数组里面去
+				//alert(dataMastersNames[ii]);	 
+				//初始化X轴上的日期  这里只需要一次更新就行 因为所有的部门都是一个时间轴 
+				 
+					var subJsonobj1=eval(depJsonArray[ii].CalendarStrings); //这里需要根据不同的部门取出不同的信息
+					
+					var tmpArray  = new Array();  // 记录具体每个部门或者设备的具体每天的活动情况
+					//alert(subJsonobj1[depJsonArray[0].dateDays[0]]);
+					for(var ij=0;ij<depJsonArray[ii].dateDays.length;ij++){//以时间的所有的时间做为一次循环
+						
+						tmpArray.push(subJsonobj1[depJsonArray[ii].dateDays[ij]]);//!----------这里需要调整为 多部门的  为每个部门添加信息 
+					}
+					everyOneDatas[dataMastersNames[ii]]=tmpArray;
+				 
+			}
+			//alert(everyOneDatas[dataMastersNames[0]].length);		
+	        xAxisTag=depJsonArray[0].dateDays;//这里是所有有数据的日期 包含数据为零的日期    
+	        }
+	  }; 
+	  	xmlhttp.open("POST","/vrvstatispro/vrvActiveStateAction",false);
+	  	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+	  	xmlhttp.send("iFunc="+iFunc+"&strStartTime="+strStartTime+"&strEndTime="+strEndTime+"&officeID="+deviceId);
+	 
+	    	var myChart = echarts.init(document.getElementById('divForDeviceHistoryInfo'));
+	    		
+			option3 = {
+			        tooltip : {
+			            trigger: 'axis'
+			        },
+			        legend: {
+			            data:[]
+			        },
+			         
+			        
+			        toolbox: {
+			            show : true,
+			            orient: 'horizontal',      // 布局方式，默认为水平布局，可选为：
+			                                       // 'horizontal' | 'vertical'
+			            x: 'right',                // 水平安放位置，默认为全图右对齐，可选为：
+			                                       // 'center' | 'left' | 'right'
+			                                       // | {number}（x坐标，单位px）
+			            y: '25',                  // 垂直安放位置，默认为全图顶端，可选为：
+			                                       // 'top' | 'bottom' | 'center'
+			                                       // | {number}（y坐标，单位px）
+			            color : ['#1e90ff','#22bb22','#4b0082','#d2691e'],
+			            backgroundColor: 'rgba(0,0,0,0)', // 工具箱背景颜色
+			            borderColor: '#ccc',       // 工具箱边框颜色
+			            borderWidth: 0,            // 工具箱边框线宽，单位px，默认为0（无边框）
+			            padding: 5,                // 工具箱内边距，单位px，默认各方向内边距为5，
+			            showTitle: true,
+			            feature : { 
+			                magicType: {
+			                    show : true,
+			                    title : {
+			                        line : '动态类型切换-折线图',
+			                        bar : '动态类型切换-柱形图',
+			                        stack : '动态类型切换-堆积',
+			                        tiled : '动态类型切换-平铺'
+			                    },
+			    				 
+			                    type : [  ]
+			                },
+			                
+			                myTool : {
+			                    show : true,
+			                    title : '自定义曲线图',
+			                    icon : 'image://assets/ico/line.png',
+			                    onclick : function (opt){
+			                     
+			                    for (var i = 0; i < opt.series.length; i++) {
+			    				   opt.series[i].type='line'; 
+			                    } 
+			    			 
+			    				//alert("自定义曲线图");
+			    				 
+			    				opt.xAxis[0].boundaryGap=false; 
+			    				myChart.setOption(opt); 
+			    				
+			    				opt.xAxis[0].boundaryGap=true; 
+			    				 for (var i = 0; i < opt.series.length; i++) {
+			    				   opt.series[i].type='bar'; 
+			                    } 
+			                    }
+			                }, 
+			                myTool3 : {
+			                    show : true,
+			                    title : '自定义柱状图',
+			                    icon : 'image://assets/ico/zhuzhuang.png',
+			                    onclick : function (opt){
+			                     
+			                    for (var i = 0; i < opt.series.length; i++) {
+			    				   opt.series[i].type=''; 
+			                    } 
+			    			 
+			    				//alert("自定义柱状图");
+			    				 
+			    				opt.xAxis[0].boundaryGap=false; 
+			    			
+			    				
+			    				opt.xAxis[0].boundaryGap=true; 
+			    				 for (var i = 0; i < opt.series.length; i++) {
+			    				   opt.series[i].type='bar'; 
+			                    } 
+			    					myChart.setOption(opt); 
+			                    }
+			                },
+			    			dataView : {
+			                    show : true,
+			                    title : '数据视图',
+			                    readOnly: true,
+			                    lang : ['数据视图', '关闭', '刷新'],
+			                    
+			                },
+			    			dataZoom : {
+			                    show : true,
+			                    title : {
+			                        dataZoom : '区域缩放',
+			                        dataZoomReset : '区域缩放-后退'
+			                    }
+			                },
+			    			mark : {
+			                    show : true,
+			                    title : {
+			                        mark : '辅助线-开关',
+			                        markUndo : '辅助线-删除',
+			                        markClear : '辅助线-清空'
+			                    },
+			                    lineStyle : {
+			                        width : 1,
+			                        color : '#1e90ff',
+			                        type : 'dashed'
+			                    }
+			                },
+			    			restore : {
+			                    show : true,
+			                    title : '还原',
+			                    color : 'black'
+			                },
+			                saveAsImage : {
+			                    show : true,
+			                    title : '保存为图片',
+			                    type : 'jpeg',
+			                    lang : ['点击本地保存'] 
+			                }
+			            }
+			        },
+			        
+			        dataZoom : {
+			            show : true,
+			            realtime : true,
+			            start : 0,
+			            end : 100
+			        },
+			         
+			        calculable : true,
+			        xAxis : [
+			            {
+			                type : 'category',
+			                boundaryGap : false,
+			                data : ['周一','周二','周三','周四','周五','周六','周日']
+			            }
+			        ],
+			        yAxis : [
+			            {
+			                type : 'value'
+			            }
+			        ],
+			        series : [  
+			        ] 
+			    };
+	     
+	   //alert("  begain to set option"); 
+	   //*******这里先把数据组装成 series需要的字符串  最后转成json对象 赋值 进去
+	    var seriesStrTmp= "["; 
+	     /*
+	    {
+	        name:'邮件营销',
+	        type:'bar', 
+	        data:[0]
+	    },
+	    */ 
+	    for(var m=0;m<depNum;m++){ 
+	                	 seriesStrTmp+="{" 
+	                     	seriesStrTmp =seriesStrTmp+"name:'"+	 dataMastersNames[m]+"',"; 
+	                    	seriesStrTmp =seriesStrTmp+"type:'bar',"; 
+	                    	seriesStrTmp =seriesStrTmp+"data:["+everyOneDatas[dataMastersNames[m]].toString()+"]";  
+	                    	if(m==depNum-1)seriesStrTmp+="}";else seriesStrTmp+="},"
+	                	  
+	    				 option3.legend.data=dataMastersNames;   
+	    				 //option3.series[m].name=dataMastersNames[m];  
+	    				 //option3.series[m].type='bar'; 
+	    				 //option3.series[m].data=everyOneDatas[dataMastersNames[m]];  
+	    			 }    
+	         seriesStrTmp+= "]";
+	    	// alert(seriesStrTmp);
+	    	 option3.series= eval('('+ seriesStrTmp+')');
+	    	// option3.series=  seriesStrTmp;
+	    
+	                  //X轴的日期数据和 everyOneDatas的每一个数组的长度是一样的   
+	    			  option3.xAxis[0].data=xAxisTag; 
+	    			  myChart.setOption(option3); 
+	    }
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+		
+	 
+    //更新设备历史信息结束 
+	 
+    
+    
+
+    function getHeadquartersDisplay()
+    {
+      
+      var xmlhttp;
+      if (window.XMLHttpRequest)
+       {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+       }
+      else
+       {// code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+       }
+      xmlhttp.onreadystatechange=function()
+      {
+          if(xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+            var result=xmlhttp.responseText;
+            //alert(result);
+            var jsonobj = eval('('+result+')');
+            totalNumber = eval(jsonobj.totalNumber);
+            unregisteredNumber = eval(jsonobj.unregisteredNumber);
+            inactiveNumber = eval(jsonobj.inactiveNumber);
+            outdomainNumber = eval(jsonobj.outdomainNumber);
+            intranetNumber = eval(jsonobj.intranetNumber);
+            internetNumber = eval(jsonobj.internetNumber);
+            /*alert(totalNumber);
+            alert(unregisteredNumber);
+            alert(inactiveNumber);
+            alert(outdomainNumber);
+            alert(intranetNumber);
+            alert(internetNumber);*/
+            $("#bChart01").html("总"+totalNumber);
+            $("#bChart02").html("总"+totalNumber);
+            $("#bChart03").html("总"+totalNumber);
+            $("#bChart04").html("外"+internetNumber);
+            $("#emChart01").html(unregisteredNumber);
+            $("#emChart02").html(inactiveNumber);
+            $("#emChart03").html(outdomainNumber);
+            $("#emChart04").html("内"+intranetNumber);
+            }
+      };
+      //
+      var Url="/vrvstatispro/HeadquartersDisplayAction";
+      Url = encodeURI(encodeURI(Url)); 
+      xmlhttp.open("POST",Url,false);
+      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      xmlhttp.send();
+    }
+    
+    
+    function fenye(){
+        var perPage = 6;//每页显示7条
+        var totalItem = $('.newpage-tbody').children().length;
+        var totalPage = Math.ceil(totalItem/perPage);
+        if(totalPage<2){
+            var pageNum = '';
+            $('.newpage').html(pageNum);
+        }else{
+            for(var i=1;i<=totalItem;i++){
+                var ItemPage = Math.ceil(i/perPage);
+                $('.newpage-table tr').eq(i).addClass(ItemPage.toString()).css('display','none');
+            }
+
+            var pageNum = '<li><a href="javascript:void(0);">上一页</a></li>'+
+                    '<li class="active"><a href="javascript:void(0);">1</a></li>';
+            for(var i=2; i<=totalPage; i++){
+                pageNum += '<li><a href="javascript:void(0);">'+ i +'</a></li>';
+            }
+            pageNum += '<li><a href="javascript:void(0);">下一页</a></li>';
+            $('.newpage').html(pageNum);
+
+            $('.1').css('display','');
+        }
+    }
+
+    $('.newpage').on("click", "a:not(.btn)", function(){
+        var currentPage = $(this).html();
+        var lastPage = $('.newpage li.active a').html();console.log(lastPage);
+        $('.newpage').children().removeClass('active');
+        if(currentPage == '上一页'){
+            if(parseInt(lastPage)<=1){
+                currentPage = parseInt(lastPage);
+            }else{
+                currentPage = parseInt(lastPage)-1;
+            }
+        }else if(currentPage == '下一页'){
+            if(parseInt(lastPage)>=($('.newpage li').length-2)){
+                currentPage = parseInt(lastPage);
+            }else{
+                currentPage = parseInt(lastPage)+1;
+            }
+        }
+        $('.newpage li:eq('+currentPage +')').addClass('active');
+        $('.newpage-tbody tr').css('display', 'none');
+        var $current = $('.' + currentPage);
+        $current.css('display', '');
+    });
+    
+    //echarts图表
+    //这个本来不需要留下的 只是这个会在真实的需要的统计图出现问题的时候 会显示这个图    
+    var myChart = echarts.init(document.getElementById('bar-chart'));
+    option1 = {
+        title : {
+            text: '当前子节点未登录情况',
+            x:'center'
+        },
+        tooltip : {
+            trigger: 'axis'
+        },
+        toolbox: {
+            show : true,
+            feature : {
+                dataView : {show: true, readOnly: false},
+                magicType: {show: true, type: ['line', 'bar']},
+                saveAsImage : {show: true}
+            }
+        },
+        calculable : true,
+        xAxis : [
+            {
+                type : 'value',
+                boundaryGap : [0, 0.01]
+            }
+        ],
+        yAxis : [
+            {
+                type : 'category',
+                data : ['子节点1','子节点2','子节点3','子节点4','子节点5']
+            }
+        ],
+        series : [
+            {
+                //name:'2011年',
+                type:'bar',
+                data:[18203, 23489, 29034, 104970, 131744, 230230]
+            }
+        ]
+    };
+
+    myChart.setOption(option1);
+
+</script>
+
+
+	<script type="text/javascript">
+
+ 
+     var  dataMastersNames = new  Array(); //记录 部门信息的数组
+    //for(var ii=0;ii<1;ii++){
+    	//部门这里暂时模拟一下  
+	//	dataMasters[ii]="模拟部门或者是设备目前只有一个 "+ii;
+	//} 
+    var everyOneDatas=  new Array();  // 记录每个部门的具体数据
+   // for(var jj=0;jj<7;jj++){
+    //	everyOneDatas[jj]= 10*jj+jj;
+	//}
+ 
+    var xAxisTag  = new Array();  // 记录X轴上的日期
+    //X轴的日期数据和 everyOneDatas的每一个数组的长度是一样的 
+    //series 的name和  legend.data对应上
+    // 
+ 
+    var depNum=0;  //记录部门数目
+
+function getHistoryData(iFunc,strStartTime,strEndTime,strOfficeId)
+{ 
+
+//alert("ajax begain");
+  var xmlhttp;
+  if (window.XMLHttpRequest)
+   {// code for IE7+, Firefox, Chrome, Opera, Safari
+    xmlhttp=new XMLHttpRequest();
+   }
+  else
+   {// code for IE6, IE5
+    xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+   }
+  xmlhttp.onreadystatechange=function()
+  {
+      if(xmlhttp.readyState==4 && xmlhttp.status==200)
+        { 
+        var result=xmlhttp.responseText; 
+         //alert(result);
+         
+         var jsonobj = eval('('+result+')');
+         var depJsonArray=eval(jsonobj.departments); 
+		 depNum=depJsonArray.length; 
+		//初始化 部门信息和每个部门的历史记录信息保存到 everyOneDatas（每个对象的历史的买一天的数据 哈希数组）    
+		//需要把部门的名字都取过来保存  <depJsonArray.length 就是部门的数量 
+     
+		
+		// alert(" alert(dataMastersNames.length);"+dataMastersNames.length);
+		dataMastersNames.splice(0,dataMastersNames.length);
+		// alert(" alert(dataMastersNames.length);"+dataMastersNames.length);
+		for(var ii=0;ii<depNum;ii++){
+        	
+			dataMastersNames[ii]=depJsonArray[ii].depName;// 把真实的数据存放到数组里面去
+			//alert(dataMastersNames[ii]);	 
+			//初始化X轴上的日期  这里只需要一次更新就行 因为所有的部门都是一个时间轴 
+			
+			//for(var jj=0; jj<dataMastersNames.length;jj++){ 
+				var subJsonobj1=eval(depJsonArray[ii].CalendarStrings); //这里需要根据不同的部门取出不同的信息
+				
+				var tmpArray  = new Array();  // 记录具体每个部门或者设备的具体每天的活动情况
+				//alert(subJsonobj1[depJsonArray[0].dateDays[0]]);
+				for(var ij=0;ij<depJsonArray[ii].dateDays.length;ij++){//以时间的所有的时间做为一次循环
+					
+					tmpArray.push(subJsonobj1[depJsonArray[ii].dateDays[ij]]);//!----------这里需要调整为 多部门的  为每个部门添加信息 
+				}
+				everyOneDatas[dataMastersNames[ii]]=tmpArray;
+			
+				//alert("tmpArray "+tmpArray.length);
+				//alert("dataMastersNames[吉林分公司].length "+dataMastersNames["吉林分公司"].length);
+				// alert("ok");
+			//} 
+		}
+		//alert(everyOneDatas[dataMastersNames[0]].length);
+        xAxisTag=depJsonArray[0].dateDays;//这里是所有有数据的日期 包含数据为零的日期    
+        }
+  };
+  //
+  	xmlhttp.open("POST","/vrvstatispro/vrvActiveStateAction",false);
+  	xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+  	xmlhttp.send("iFunc="+iFunc+"&strStartTime="+strStartTime+"&strEndTime="+strEndTime+"&officeID="+strOfficeId);
+}
+ 
+    
+    function refreshBottonMap(funNum,startTime,endTime,departmentId){
+    	
+    	
+    	//getHistoryData(3,"2014-07-31 15:00:17","2015-04-13 09:29:31",274);
+    	
+    	getHistoryData(funNum,startTime,endTime,departmentId);
+    	var myChart = echarts.init(document.getElementById('bar-chart'));
+    		
+		    	option3 = {
+		        tooltip : {
+		            trigger: 'axis'
+		        },
+		        legend: {
+		            data:[]
+		        },
+		         
+		        
+		        toolbox: {
+		            show : true,
+		            orient: 'vertical',      // 布局方式，默认为水平布局，可选为：
+		                                       // 'horizontal' | 'vertical'
+		            x: 'right',                // 水平安放位置，默认为全图右对齐，可选为：
+		                                       // 'center' | 'left' | 'right'
+		                                       // | {number}（x坐标，单位px）
+		            y: 'top',                  // 垂直安放位置，默认为全图顶端，可选为：
+		                                       // 'top' | 'bottom' | 'center'
+		                                       // | {number}（y坐标，单位px）
+		            color : ['#1e90ff','#22bb22','#4b0082','#d2691e'],
+		            backgroundColor: 'rgba(0,0,0,0)', // 工具箱背景颜色
+		            borderColor: '#ccc',       // 工具箱边框颜色
+		            borderWidth: 0,            // 工具箱边框线宽，单位px，默认为0（无边框）
+		            padding: 5,                // 工具箱内边距，单位px，默认各方向内边距为5，
+		            showTitle: true,
+		            feature : { 
+		                magicType: {
+		                    show : true,
+		                    title : {
+		                        line : '动态类型切换-折线图',
+		                        bar : '动态类型切换-柱形图',
+		                        stack : '动态类型切换-堆积',
+		                        tiled : '动态类型切换-平铺'
+		                    },
+		    				 
+		                    type : [  ]
+		                },
+		                
+		                myTool : {
+		                    show : true,
+		                    title : '自定义曲线图',
+		                    icon : 'image://assets/ico/line.png',
+		                    onclick : function (opt){
+		                     
+		                    for (var i = 0; i < opt.series.length; i++) {
+		    				   opt.series[i].type='line'; 
+		                    } 
+		    			 
+		    				//alert("自定义曲线图");
+		    				 
+		    				opt.xAxis[0].boundaryGap=false; 
+		    				myChart.setOption(opt); 
+		    				
+		    				opt.xAxis[0].boundaryGap=true; 
+		    				 for (var i = 0; i < opt.series.length; i++) {
+		    				   opt.series[i].type='bar'; 
+		                    } 
+		                    }
+		                }, 
+		                myTool3 : {
+		                    show : true,
+		                    title : '自定义柱状图',
+		                    icon : 'image://assets/ico/zhuzhuang.png',
+		                    onclick : function (opt){
+		                     
+		                    for (var i = 0; i < opt.series.length; i++) {
+		    				   opt.series[i].type=''; 
+		                    } 
+		    			 
+		    				//alert("自定义柱状图");
+		    				 
+		    				opt.xAxis[0].boundaryGap=false; 
+		    			
+		    				
+		    				opt.xAxis[0].boundaryGap=true; 
+		    				 for (var i = 0; i < opt.series.length; i++) {
+		    				   opt.series[i].type='bar'; 
+		                    } 
+		    					myChart.setOption(opt); 
+		                    }
+		                },
+		    			dataView : {
+		                    show : true,
+		                    title : '数据视图',
+		                    readOnly: true,
+		                    lang : ['数据视图', '关闭', '刷新'],
+		                    
+		                },
+		    			dataZoom : {
+		                    show : true,
+		                    title : {
+		                        dataZoom : '区域缩放',
+		                        dataZoomReset : '区域缩放-后退'
+		                    }
+		                },
+		    			mark : {
+		                    show : true,
+		                    title : {
+		                        mark : '辅助线-开关',
+		                        markUndo : '辅助线-删除',
+		                        markClear : '辅助线-清空'
+		                    },
+		                    lineStyle : {
+		                        width : 1,
+		                        color : '#1e90ff',
+		                        type : 'dashed'
+		                    }
+		                },
+		    			restore : {
+		                    show : true,
+		                    title : '还原',
+		                    color : 'black'
+		                },
+		                saveAsImage : {
+		                    show : true,
+		                    title : '保存为图片',
+		                    type : 'jpeg',
+		                    lang : ['点击本地保存'] 
+		                }
+		            }
+		        },
+		        
+		        dataZoom : {
+		            show : true,
+		            realtime : true,
+		            start : 20,
+		            end : 80
+		        },
+		         
+		        calculable : true,
+		        xAxis : [
+		            {
+		                type : 'category',
+		                boundaryGap : false,
+		                data : ['周一','周二','周三','周四','周五','周六','周日']
+		            }
+		        ],
+		        yAxis : [
+		            {
+		                type : 'value'
+		            }
+		        ],
+		        series : [  
+		        ] 
+		    };
+     
+   //alert("  begain to set option"); 
+   //*******这里先把数据组装成 series需要的字符串  最后转成json对象 赋值 进去
+    var seriesStrTmp= "["; 
+    for(var m=0;m<depNum;m++){ 
+                	 seriesStrTmp+="{" 
+                     	seriesStrTmp =seriesStrTmp+"name:'"+	 dataMastersNames[m]+"',"; 
+                    	seriesStrTmp =seriesStrTmp+"type:'bar',"; 
+                    	seriesStrTmp =seriesStrTmp+"data:["+everyOneDatas[dataMastersNames[m]].toString()+"]";  
+                    	if(m==depNum-1)seriesStrTmp+="}";else seriesStrTmp+="},"
+                	  
+    				 option3.legend.data=dataMastersNames;   
+    				 //option3.series[m].name=dataMastersNames[m];  
+    				 //option3.series[m].type='bar'; 
+    				 //option3.series[m].data=everyOneDatas[dataMastersNames[m]];  
+    			 }    
+         seriesStrTmp+= "]";
+    	// alert(seriesStrTmp);
+    	 option3.series= eval('('+ seriesStrTmp+')');
+    	// option3.series=  seriesStrTmp;
+    
+                  //X轴的日期数据和 everyOneDatas的每一个数组的长度是一样的   
+    			  option3.xAxis[0].data=xAxisTag; 
+    			  console.log(option3);
+    			  myChart.setOption(option3); 
+    } 
+	      //window.onload = AfterLoadShow; 
+	
+	      
+	      getOrgListContent();
+    	  getStatisContent(0,'信息技术部','430'); 
+	      refreshBottonMap(8,LastMonthDatetime,NowDatetime,430); //!!!// 
+	 
+	      c.showMoreDay = true;
+	      c.show(this,'1980-01-01');
+	
+	getHeadquartersDisplay();
+	getLoginfo();
+</script>
+
+	</body>
+</html>

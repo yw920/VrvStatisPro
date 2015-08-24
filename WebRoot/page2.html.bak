@@ -1,0 +1,540 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>分布式实时监控中心</title>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="assets/easyui/themes/default/easyui.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/retina.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles/color.css"/>
+    <link rel="stylesheet" href="assets/styles/all.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/styles/style.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="assets/css/font-awesome.min.css">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="assets/css/smartadmin-production.css">
+
+    <link rel="shortcut icon" href="img/favicon/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="img/favicon/favicon.ico" type="image/x-icon">
+    
+<link rel="stylesheet" type="text/css" href="./assets/css/jquery.dataTables.min.css">
+<link rel="stylesheet" type="text/css" href="./assets/css/dataTables.editor.min.css">
+<link rel="stylesheet" type="text/css" href="./assets/css/dataTables.tableTools.min.css">
+
+<script src="js/app.js"></script>
+
+<script src="assets/js/custom.min.js"></script>
+<script src="assets/js/core.min.js"></script>
+
+<script src="assets/easyui/jquery-1.9.1.js"></script>
+<script type="text/javascript" src="assets/easyui/jquery.min.js"></script>
+<script type="text/javascript" src="assets/easyui/jquery.easyui.min.js"></script>
+
+    <style type="text/css">
+        body {
+            overflow: hidden !important;
+        }
+        .label-important{
+            background:#ff5454;
+        }
+        .fa-white{
+            color:#fff;
+        }
+        .label{
+            font-weight: inherit;
+        }
+        .fenye {
+            height:50px;
+            border: #000 1px solid;
+        }
+        .newpage a{
+            color: #000;
+        }
+         .out{ border-top:59px #FF5511 solid;/*上边框宽度等于表格第一行行高*/
+                                            width:0px;/*让容器宽度为0*/ 
+                                          height:0px;/*让容器高度为0*/ 
+         border-right:123px #FF9900 solid;/*左边框宽度等于表格第一行第一格宽度*/ 
+                                  position:relative;/*让里面的两个子容器绝对定位*/ }
+          .fen{ border-top:59px #008080 solid;/*上边框宽度等于表格第一行行高*/
+                                            width:0px;/*让容器宽度为0*/ 
+                                          height:0px;/*让容器高度为0*/ 
+         border-right:123px #556B2F solid;/*左边框宽度等于表格第一行第一格宽度*/ 
+                                  position:relative;/*让里面的两个子容器绝对定位*/ }
+        .in{ border-top:59px #808000 solid;/*上边框宽度等于表格第一行行高*/
+                                            width:0px;/*让容器宽度为0*/ 
+                                          height:0px;/*让容器高度为0*/ 
+         border-right:123px #2F4F4F solid;/*左边框宽度等于表格第一行第一格宽度*/ 
+                                  position:relative;/*让里面的两个子容器绝对定位*/ }
+         .pri{ border-top:59px #C0C0C0 solid;/*上边框宽度等于表格第一行行高*/
+                                            width:0px;/*让容器宽度为0*/ 
+                                          height:0px;/*让容器高度为0*/ 
+         border-right:123px #808080 solid;/*左边框宽度等于表格第一行第一格宽度*/ 
+                                  position:relative;/*让里面的两个子容器绝对定位*/ }
+        b{font-style:normal;display:block;position:absolute;}
+   em{font-style:normal;display:block;position:absolute;}
+    </style>
+
+<script type="text/javascript">
+
+$(document).ready(function(){
+  $("#divD").toggle(0);
+  $("#divD2").toggle(0);
+  $("#btnFad").click(function(){
+      $("#divD").toggle(1000);
+  });
+  $("#btnSet").click(function(){
+      $("#divD2").toggle(1000);
+  });
+  
+  $("#setTabHead").click(function(){
+      var SelectedId = "";
+      var SelectedBox = [];
+      for(var i=1; i<= 50; i++){
+         SelectedId = "selected"+i;
+         if(document.getElementById(SelectedId) != null && document.getElementById(SelectedId).checked==true){
+             SelectedBox.push(i);
+         };
+      }
+      console.log("SelectedBox:");
+      console.log(SelectedBox);
+      var strSelectedBox = SelectedBox.toString();
+      
+      var xmlhttp;
+      if (window.XMLHttpRequest)
+       {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+       }
+      else
+       {// code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+       }
+      xmlhttp.onreadystatechange=function()
+      {
+          if(xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+            var result=xmlhttp.responseText;
+                alert(result);
+                setSelecttabHead();
+                getStatisContent(GItem,GOrgName,GOrgId);
+            }
+      };
+      var Url="/vrvstatispro/DevicesHeadsAction?action=2&selecteds="+strSelectedBox;
+      Url = encodeURI(encodeURI(Url));
+      xmlhttp.open("POST",Url,false);
+      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      xmlhttp.send();
+  });
+});
+</script> 
+</head>
+<body style="min-width: 1200px; height:100%;background:#e9ebec;min-height:519px;overflow:hidden !important;">
+<div class="easyui-layout" style="width:100%;height:100%;opacity:1;">
+    <div data-options="region:'center'" style="width:70% !important;">
+         <div id="graphic" class="span8" style="width:100% !important;height:100%">
+             <div class="row">
+                 <div class="col-lg-12">
+                     <div class="box" style="margin:0 30px 0 10px;">
+                         <div class="box-header" data-original-title>
+                             <div style="margin-left:50px!important">
+                                <h2><span class="break"></span></h2>
+                                <div style="margin-top:-5px!important" align="right">
+                                    <p class="btn-group" align="right">
+                                        <button id="btnFad" class="btn" style="border: #e0e0e0 1px solid;"><i class="fa fa-chain">查询选项</i></button>
+                                        <button id="btnSet" class="btn" style="border: #e0e0e0 1px solid;"><i class="fa fa-chain">列表设置</i></button>
+                                        <button id="btnExport" class="btn" style="border: #e0e0e0 1px solid;" onclick="javascript:createExcel('selectTabHead')"><i class="fa fa-chain">数据导出</i></button>
+                                    </p>
+                                </div>
+                                <div id="divD" style="margin-top:-5px!important" align="right">
+                                    <div class="easyui-layout" style="border: #e0e0e0 1px solid;width:800px;height:300px;opacity:1;">
+                                    <div data-options="region:'west'" style="width:50% !important;">
+                                    <i class="fa fa-chain">高级查询</i><br><br>
+                                    <i class="fa">注册设备：</i>&nbsp;&nbsp;&nbsp;<input type="checkbox" id="RegCheckB" checked="checked"/><br><br>
+                                    <i class="fa">加域设备：</i>&nbsp;&nbsp;&nbsp;<input type="checkbox" id="DomCheckB" checked="checked"/><br><br>
+                                    <i class="fa">未加域设备：</i>&nbsp;&nbsp;<input type="checkbox" id="UDomCheckB" checked="checked"/><br><br>
+                                    <i class="fa">内网设备：</i>&nbsp;&nbsp;&nbsp;<input type="checkbox" id="IntraCheckB" checked="checked"/><br><br>
+                                    <i class="fa">外网设备：</i>&nbsp;&nbsp;&nbsp;<input type="checkbox" id="InterCheckB" checked="checked"/>
+                                    &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<button id="findCondition" class="btn"><i class="fa fa-cogs">确定</i></button><br><br><br><br>
+                                    </div>
+                                    <div data-options="region:'east'" style="width:50% !important;">
+                                    <i class="fa fa-chain">高级方式</i><br><br>
+                                    <i class="fa">MAC：</i>&nbsp;&nbsp;<input type="text" name="btntxt" id="macid"/><br><br>
+                                    <i class="fa">IP：</i>&nbsp;&nbsp;&nbsp;<input type="text" name="btntxt" id="ipid"/><br><br>
+                                    <i class="fa">用户名称：</i>&nbsp;&nbsp;<input type="text" name="btntxt" id="usernameid"/><br><br>
+                                    <br>
+                                    <button id="findMethod" class="btn"><i class="fa fa-cogs">确定</i></button><br><br>
+                                    </div>
+                                    </div>
+                                    <br><br>
+                                </div>
+                                <div id="divD2" style="margin-top:-5px!important" align="right">
+                                    <div class="easyui-layout" style="border: #e0e0e0 1px solid;width:800px;height:300px;opacity:1;">
+                                    <i class="fa fa-chain">列表选项</i><br><br>
+                                    <table id="selecttab01">
+                                    </table>
+                                    <br>
+                                    <button id="setTabHead" class="btn"><i class="fa fa-cogs">确定</i></button><br>
+                                    </div>
+                                    <br><br>
+                                </div>
+                             </div>
+                         </div>
+                         <div style="width:100%;height:800px;overflow:auto !important;">
+                             <table id="selectTabHead" class="table table-striped table-bordered bootstrap-datatable datatable newpage-table">
+                                 <thead>
+                                 <tr id="theadtr01">
+                                 </tr>
+                                 </thead>
+                                 <tbody id="main_table01" class="newpage-tbody">
+                                 </tbody>
+                             </table>
+                             <div class="pagination pagination-centered newpage" style="float:right;margin:0 0 10px 0;">
+                             </div>
+
+                         </div>
+                     </div>
+                 </div>
+             </div>
+         </div>
+    </div>
+    <div data-options="region:'west',split:true" 
+        style="padding:10px;width:16%;height:400px;overflow:auto;border-right: #e0e0e0 1px solid;">
+        <h2></h2>
+        <div style="margin:20px 0;"></div>
+        <div class="easyui-panel" style="padding:5px;width:100%;">
+            <ul id="ttlist1" class="easyui-tree" data-options="url:'/vrvstatispro/GetOrgListAction?OrgId=1&OrgAction=1',onClick:function(node){getStatisContent(0,node.text,node.id);},onBeforeExpand:function(node){$('#ttlist1').tree('options').url='/vrvstatispro/GetOrgListAction?OrgId='+node.id+'&OrgAction=2'; }">
+            </ul>
+        </div>
+    </div>
+</div>
+
+<script src="js/bootstrap/bootstrap.min.js"></script>
+<script src="assets/js/jquery.nestable.min.js"></script>
+<script src="assets/js/pages/ui-nestable-list.js"></script>
+<script src="assets/js/jquery.sparkline.min.js"></script>
+<script src="assets/js/pages/table.js"></script>
+<script src="assets/js/dataTables.bootstrap.min.js"></script>
+<script src="assets/js/jquery.dataTables.min.js"></script>
+<script src="assets/js/dataTables.tableTools.min.js"></script>
+
+<script>
+    var GItem;
+    var GOrgName;
+    var GOrgId;
+    
+    
+    getSelecttab = function()
+    {
+      
+      var xmlhttp;
+      if (window.XMLHttpRequest)
+       {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+       }
+      else
+       {// code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+       }
+      xmlhttp.onreadystatechange=function()
+      {
+          if(xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+            var result=xmlhttp.responseText;
+            //alert(result);
+            $("#selecttab01").html(result);
+            }
+      };
+      //
+      var Url="/vrvstatispro/DevicesHeadsAction?action=0";
+      //Url = encodeURI(encodeURI(Url));
+      xmlhttp.open("POST",Url,false);
+      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      xmlhttp.send();
+    }
+    setSelecttabHead = function()
+    {
+      
+      var xmlhttp;
+      if (window.XMLHttpRequest)
+       {// code for IE7+, Firefox, Chrome, Opera, Safari
+        xmlhttp=new XMLHttpRequest();
+       }
+      else
+       {// code for IE6, IE5
+        xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+       }
+      xmlhttp.onreadystatechange=function()
+      {
+          if(xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+            var result=xmlhttp.responseText;
+            //alert(result);
+            $("#theadtr01").html(result);
+            }
+      };
+      //
+      var Url="/vrvstatispro/DevicesHeadsAction?action=1";
+      //Url = encodeURI(encodeURI(Url));
+      xmlhttp.open("POST",Url,false);
+      xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+      xmlhttp.send();
+    }
+
+    function getStatisContent(item,OrgName,OrgId)
+    {
+        GItem = item;
+        GOrgName = OrgName;
+        GOrgId = OrgId;
+        
+        
+        var xmlhttp;
+        if (window.XMLHttpRequest)
+         {// code for IE7+, Firefox, Chrome, Opera, Safari
+          xmlhttp=new XMLHttpRequest();
+         }
+        else
+         {// code for IE6, IE5
+          xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+         }
+        xmlhttp.onreadystatechange=function()
+        {
+            if(xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+              var result=xmlhttp.responseText;
+              //alert(result);
+              var jsonobj = eval('('+result+')');
+              var subJsonobj1=eval(jsonobj.return);
+              var main_table01="";
+              var sublength = subJsonobj1.length;
+              console.log("sublength:"+sublength);
+              for(var i = 0;i<sublength;i++){
+                      main_table01 += "<tr>";
+                      var subsublength = subJsonobj1[i].length;
+                      //console.log("subsublength:"+subsublength);
+                      for(var j = 0;j<subsublength;j++){
+                          main_table01 += "<td>"+subJsonobj1[i][j]+"</td>";
+                      }
+                      main_table01 +="</tr>";
+              }
+              //alert(main_table01);
+              $("#main_table01").html(main_table01);
+              fenye();
+            }
+        };
+        //
+        var Url="/vrvstatispro/DevicesDetailsAction?Item="+item+"&OfficeName="+OrgName+"&OrgId="+OrgId;
+        console.log(Url);
+        Url = encodeURI(encodeURI(Url));
+        xmlhttp.open("POST",Url,false);
+        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        xmlhttp.send();
+    }
+    
+    $("#findCondition").click(function(){
+        var SelectedCond1 = 0;
+        var SelectedCond2 = 0;
+        var SelectedCond3 = 0;
+        var SelectedCond4 = 0;
+        var SelectedCond5 = 0;
+        if(document.getElementById("RegCheckB") != null && document.getElementById("RegCheckB").checked==true){
+            SelectedCond1 = 1;
+        };
+        if(document.getElementById("DomCheckB") != null && document.getElementById("DomCheckB").checked==true){
+            SelectedCond2 = 1;
+        };
+        if(document.getElementById("UDomCheckB") != null && document.getElementById("UDomCheckB").checked==true){
+            SelectedCond3 = 1;
+        };
+        if(document.getElementById("IntraCheckB") != null && document.getElementById("IntraCheckB").checked==true){
+            SelectedCond4 = 1;
+        };
+        if(document.getElementById("InterCheckB") != null && document.getElementById("InterCheckB").checked==true){
+            SelectedCond5 = 1;
+        };
+        if(SelectedCond1!= 1){
+            alert("注册设备项暂时必须选！");
+            return;
+        }
+        if(SelectedCond4!= 1 && SelectedCond5!= 1){
+            alert("内外网至少选其一！");
+            return;
+        }
+        if(SelectedCond2!= 1 && SelectedCond3!= 1){
+            alert("加域或未加域至少选其一！");
+            return;
+        }
+        if(SelectedCond2==1 && SelectedCond3==1 && SelectedCond4==1 && SelectedCond5==1){
+            getStatisContent(0, GOrgName, GOrgId);
+        }
+        else if(SelectedCond2==1 && SelectedCond4==1 && SelectedCond5==1){//加域
+            getStatisContent(1, GOrgName, GOrgId);
+        }
+        else if(SelectedCond3==1 && SelectedCond4==1 && SelectedCond5==1){//未加域
+            getStatisContent(2, GOrgName, GOrgId);
+        }
+        else if(SelectedCond2==1 && SelectedCond3==1 && SelectedCond4==1){//内网
+            getStatisContent(5, GOrgName, GOrgId);
+        }
+        else if(SelectedCond2==1 && SelectedCond3==1 && SelectedCond5==1){//外网
+            getStatisContent(10, GOrgName, GOrgId);
+        }
+        else if(SelectedCond2==1 && SelectedCond4==1){//加域 内网
+            getStatisContent(6, GOrgName, GOrgId);
+        }
+        else if(SelectedCond3==1 && SelectedCond4==1){//未加域 内网
+            getStatisContent(7, GOrgName, GOrgId);
+        }
+        else if(SelectedCond2==1 && SelectedCond5==1){//加域 外网
+            getStatisContent(11, GOrgName, GOrgId);
+        }
+        else if(SelectedCond3==1 && SelectedCond5==1){//未加域 外网
+            getStatisContent(12, GOrgName, GOrgId);
+        }
+        else return;
+    });
+    $("#findMethod").click(function(){
+    	var Mac = "";
+    	var Ip = "";
+    	var Username = "";
+        
+        Mac = document.getElementById("macid").value;
+        Ip = document.getElementById("ipid").value;
+        Username = document.getElementById("usernameid").value;
+        
+        var Condition = "";
+        if(Mac != null && Mac != ""){
+            Condition += "MacAddress = '"+Mac+"'";
+        }
+        if(Ip != null && Ip != ""){
+            if(Condition == "")Condition += "IpAddres = '"+Ip+"'";
+            else Condition += " and IpAddres = '"+Ip+"'";
+        }
+        if(Username != null && Username != ""){
+            if(Condition == "")Condition += "UserName = '"+Username+"'";
+            else Condition += " and Username = '"+Username+"'";
+        }
+        
+        var xmlhttp;
+        if (window.XMLHttpRequest)
+         {// code for IE7+, Firefox, Chrome, Opera, Safari
+          xmlhttp=new XMLHttpRequest();
+         }
+        else
+         {// code for IE6, IE5
+          xmlhttp=new ActiveXObject("Microsoft.XMLHTTP");
+         }
+        xmlhttp.onreadystatechange=function()
+        {
+            if(xmlhttp.readyState==4 && xmlhttp.status==200)
+            {
+              var result=xmlhttp.responseText;
+              //alert(result);
+              var jsonobj = eval('('+result+')');
+              var subJsonobj1=eval(jsonobj.return);
+              var main_table01="";
+              var sublength = subJsonobj1.length;
+              console.log("sublength:"+sublength);
+              for(var i = 0;i<sublength;i++){
+                      main_table01 += "<tr>";
+                      var subsublength = subJsonobj1[i].length;
+                      //console.log("subsublength:"+subsublength);
+                      for(var j = 0;j<subsublength;j++){
+                          main_table01 += "<td>"+subJsonobj1[i][j]+"</td>";
+                      }
+                      main_table01 +="</tr>";
+              }
+              //alert(main_table01);
+              $("#main_table01").html(main_table01);
+              fenye();
+            }
+        };
+        //
+        var Url="";  
+        if(Condition != "")Url="/vrvstatispro/DevicesDetailsAction?Item="+15+"&OfficeName="+GOrgName+"&OrgId="+GOrgId+"&Condition2="+Condition;
+        else Url="/vrvstatispro/DevicesDetailsAction?Item="+GItem+"&OfficeName="+GOrgName+"&OrgId="+GOrgId+"&Condition2="+Condition;
+        console.log(Url);
+        Url = encodeURI(encodeURI(Url));
+        xmlhttp.open("POST",Url,false);
+        xmlhttp.setRequestHeader("Content-type","application/x-www-form-urlencoded");
+        xmlhttp.send();
+    });
+    
+    function fenye(){
+        var perPage = 30;
+        var totalItem = $('.newpage-tbody').children().length;
+        var totalPage = Math.ceil(totalItem/perPage);
+        if(totalPage<2){
+            var pageNum = '';
+            $('.newpage').html(pageNum);
+        }else{
+            for(var i=1;i<=totalItem;i++){
+                var ItemPage = Math.ceil(i/perPage);
+                $('.newpage-table tr').eq(i).addClass(ItemPage.toString()).css('display','none');
+            }
+
+            var pageNum = '<li><a href="javascript:void(0);">上一页</a></li>'+
+                    '<li class="active"><a href="javascript:void(0);">1</a></li>';
+            for(var i=2; i<=totalPage; i++){
+                pageNum += '<li><a href="javascript:void(0);">'+ i +'</a></li>';
+            }
+            pageNum += '<li><a href="javascript:void(0);">下一页</a></li>';
+            $('.newpage').html(pageNum);
+
+            $('.1').css('display','');
+        }
+    }
+
+    $('.newpage').on("click", "a:not(.btn)", function(){
+        var currentPage = $(this).html();
+        var lastPage = $('.newpage li.active a').html();console.log(lastPage);
+        $('.newpage').children().removeClass('active');
+        if(currentPage == '上一页'){
+            if(parseInt(lastPage)<=1){
+                currentPage = parseInt(lastPage);
+            }else{
+                currentPage = parseInt(lastPage)-1;
+            }
+        }else if(currentPage == '下一页'){
+            if(parseInt(lastPage)>=($('.newpage li').length-2)){
+                currentPage = parseInt(lastPage);
+            }else{
+                currentPage = parseInt(lastPage)+1;
+            }
+        }
+        $('.newpage li:eq('+currentPage +')').addClass('active');
+        $('.newpage-tbody tr').css('display', 'none');
+        var $current = $('.' + currentPage);
+        $current.css('display', '');
+    });
+
+    getSelecttab();
+    setSelecttabHead();
+    getStatisContent(0,'中国人民财产保险股份有限公司',1);
+    
+</script>
+
+<script type="text/javascript">
+function createExcel(id) {
+    TableTools.DEFAULTS.aButtons = ["xls"];
+    $("#" + id).dataTable({
+      "bJQueryUI": false,
+      'bPaginate': false,
+      "bRetrieve": false,
+      "bInfo": false,
+      "bDestroy": true,
+      "bServerSide": false,
+      "bProcessing": true,
+      "bFilter": false,
+      "bLengthChange": false,
+      "bSort": false,
+      "bStateSave": false,
+      "sAjaxDataProp": "data",
+      "sDom": 'T<"clear">lfrtip',
+      "oTableTools": {
+        "sSwfPath": "./assets/swf/copy_csv_xls.swf"
+      }
+    } );
+  }
+</script>
+</body>
+</html>

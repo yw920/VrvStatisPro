@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE struts PUBLIC "-//Apache Software Foundation//DTD Struts Configuration 2.1//EN" "http://struts.apache.org/dtds/struts-2.1.dtd">
+<struts>
+	<package name="vrvssh" extends="struts-default" >
+		<interceptors>
+		<interceptor name="Check" class="com.vrv.action.CheckLoginIntercptor"/>	
+		<interceptor-stack name="CheckLogin">
+			<interceptor-ref name="Check"></interceptor-ref>
+			<interceptor-ref name="defaultStack"></interceptor-ref>	
+		</interceptor-stack>	
+		</interceptors>
+		
+		<global-results>
+			<result name="login">/index.html</result>
+		</global-results>
+	
+		<action name="vrvRegisteredTerminalAction" class="RegisteredTerminalAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+				<interceptor-ref name="CheckLogin"/>
+		</action>
+		<action name="DomLoginTerminalAction" class="DomLoginTerminalAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+				<interceptor-ref name="CheckLogin"/>
+		</action>
+		<action name="vrvActiveStateAction" class="ActiveStateAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+				<interceptor-ref name="CheckLogin"/>
+		</action>
+		<action name="GetOrgListAction" class="GetOrgListAction">
+		
+			<interceptor-ref name="CheckLogin"/>
+				
+		</action>	
+		<action name="HeadquartersDisplayAction" class="HeadquartersDisplayAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+				<interceptor-ref name="CheckLogin"/>
+		</action>	
+		<action name="LoginfoAction" class="LoginfoAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+				<interceptor-ref name="CheckLogin"/>
+		</action>	
+		
+		<action name="GetSubOrgListAction" class="GetSubOrgListAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+			<interceptor-ref name="CheckLogin"/>
+		</action>	
+		<action name="DevicesStatisAction" class="DevicesStatisAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+			<interceptor-ref name="CheckLogin"/>
+		</action>	
+		<action name="DataregetAction" class="com.vrv.action.DataregetAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+			<interceptor-ref name="CheckLogin"/>
+		</action>
+		<action name="DevicesDetailsAction" class="DevicesDetailsAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+			<interceptor-ref name="CheckLogin"/>
+		</action>
+		<!--  wengjiang  -->
+		<action name="getDeviceHistoryInfoExcelAction" class="GetDeviceHistoryInfoExcelAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+			<interceptor-ref name="CheckLogin"/>
+		</action>	
+		<action name="getJustOneDeviceHistoryInfoExcelAction" class="GetJustOneDeviceHistoryInfoExcelAction">
+			<!-- <result name="success">/success.jsp</result>
+			<result name="error">/index.jsp</result> -->
+				<interceptor-ref name="CheckLogin"/>
+		</action>	
+		<!--  wengjiang  end -->
+		
+		<action name="UserLoginAction" class="UserLoginAction">
+		    <result name="success">/content.html</result>
+		    <result name="login">/index.html</result>
+		</action>	
+		
+		<action name="UserExitAction" class="com.vrv.action.UserExitAction">
+		    <result name="success">/index.html</result>
+		    <interceptor-ref name="CheckLogin"/>
+		</action>
+	
+	    <action name="AddUserAction" class="AddUserAction">
+		    <interceptor-ref name="CheckLogin"/>
+		</action>
+		<action name="EditPasswordAction" class="EditPasswordAction">
+		</action>
+	
+	</package>
+	
+</struts>    

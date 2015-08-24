@@ -1,0 +1,13 @@
+body {
+    height:100%;
+    min-width: 1200px;
+    min-height:519px;
+    overflow:hidden;
+}
+.censer{
+    padding-left:0;
+    height:292px;
+    width:278px;
+    border-radius:0 0 5px 5px;
+    display: block;
+}

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta http-equiv="content-type" content="text/html;charset=utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <link href="assets/easyui/themes/default/easyui.css" rel="stylesheet" type="text/css">
+    <link href="assets/css/retina.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles/color.css"/>
+    <link rel="stylesheet" href="assets/styles/all.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="assets/css/bootstrap.min.css">
+    <link rel="stylesheet" href="assets/styles/style.css"/>
+    <link rel="stylesheet" type="text/css" media="screen" href="assets/css/font-awesome.min.css">
+    <link rel="stylesheet" type="text/css" media="screen" href="assets/css/signin.css">
+
+    <link rel="stylesheet" type="text/css" media="screen" href="assets/css/smartadmin-production.css">
+
+    <link rel="shortcut icon" href="img/favicon/favicon.ico" type="image/x-icon">
+    <link rel="icon" href="img/favicon/favicon.ico" type="image/x-icon">
+
+    <title>分布式实时监控中心</title>
+
+
+</head>
+
+<body style="min-width: 1900px;background:rgb(255, 255, 255);height:100% !important;width:100% !important;" >
+<div class="banner">
+    <img src="./img/logo2.png" alt="logo" width="500px" style="margin-top:12px"/>
+    <br>
+</div>
+<hr />
+
+<div class="easyui-layout" style="width:1800px;height:800px !important;opacity:1;">
+    <div data-options="region:'east'" style="height:700px !important;width:40% !important;">
+    	<div class="easyui-layout" style="width:100%;height:800px !important;opacity:1;margin-left:50px">
+		    <img src="./img/picc1.png" alt="logo" width="100%" style="margin-top:10px"/>
+		    <form class="form-signin" method="post" action="/vrvstatispro/UserLoginAction">
+		        <h1 class="form-signin-heading" >用户登录</h1><hr>
+		        <label for="inputUser" class="sr-only">用户名</label>
+		        <input type="user" id="inputUser" name="userName" class="form-control" placeholder="请输入用户名" style="width:93% !important;" required autofocus><br><br>
+		        <label for="inputPassword" class="sr-only">密码</label>
+		        <input type="password" id="inputPassword" name="passWord" class="form-control" placeholder="请输入密码" style="width:93% !important;" required><br><br>
+		        <input id="time" name="time" type="hidden" />
+		         <input id="hostName" name="hostName" type="hidden" />
+		        <button id="mySubmit" class="btn btn-lg btn-primary btn-block" style="width:93% !important;" type="submit">登录</button>
+		    </form>
+		</div>
+    </div>
+    <div data-options="region:'west',split:true" style="padding:5px;height:700px !important;width:60% !important;border-right: #e0e0e0 1px solid;">
+        <img src="./img/picc2.jpg" alt="logo" width="100%" style="margin-top:12px"/>
+		<br>
+    </div>
+</div>
+
+
+
+
+<script type="text/javascript" src="assets/easyui/jquery.min.js"></script>
+<script type="text/javascript" src="assets/easyui/jquery.easyui.min.js"></script>
+<script src="js/bootstrap/bootstrap.min.js"></script>
+<script src="js/app.js"></script>
+<script type="text/javascript" src="assets/js/echarts-all.js"></script>
+
+<script src="assets/js/custom.min.js"></script>
+<script src="assets/js/core.min.js"></script>
+
+<script src="assets/js/jquery.nestable.min.js"></script>
+<script src="assets/js/pages/ui-nestable-list.js"></script>
+
+<script src="assets/js/jquery.sparkline.min.js"></script>
+<script src="assets/js/jquery.dataTables.min.js"></script>
+<script src="assets/js/dataTables.bootstrap.min.js"></script>
+<script src="assets/js/pages/table.js"></script>
+<script type="text/javascript">
+	function getTime(){
+		var myDate = new Date()
+		var time = myDate.toLocaleString()
+		return time
+	}
+	function getHostName(){
+		var WshShell = new ActiveXObject("WScript.Shell")
+		var str = WshShell.ExpandEnvironmentStrings("%COMPUTERNAME%")
+	return str
+		
+		
+	}
+	
+	$('#mySubmit').on('click',function(){
+		$('#time').val(getTime())
+		$('#hostName').val(getHostName())
+	})
+
+
+</script>
+
+
+
+</body>
+</html>
+

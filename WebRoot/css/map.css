@@ -1,0 +1,76 @@
+body {
+    min-width: 1200px;
+    height:100%;
+    background-color:transparent;
+    min-height:519px;
+    overflow:hidden;
+}
+.widget-body #site-stats .legend {
+    position: absolute;
+    top: 0px;
+    left: 185px;
+}
+.btn_group #btn_red {
+    background-image: url("../asset/img/btn_red.png");
+    width: 180px;
+    height: 58px;
+    border: 0px;
+    color: #000;
+    font-size: 19px;
+    font-weight: bold;
+}
+.btn_group #btn_green {
+    background-image: url("../asset/img/btn_green.png");
+    width: 180px;
+    height: 58px;
+    border: 0px;
+    color: #000;
+    font-size: 19px;
+    font-weight: bold;
+}
+.btn_group {
+    right: 0;
+    bottom: 56px;
+    z-index: 10;
+    position: absolute;
+}
+.div_warning, .div_caution {
+    width: 364px;
+    right: 0;
+    bottom: 110px;
+    z-index: 10;
+    position: absolute;
+    display: none;
+}
+.table_warning, .table_caution {
+    border: #bacfe7 solid 1px;
+    background-color: #bce8f1;
+}
+.table_warning thead tr {
+    height: 32px;
+    background: rgba(50, 150, 150, 1);
+}
+.table_caution thead tr {
+    height: 32px;
+    background: rgba(50, 150, 150, 1);
+}
+.easyui-layout {
+    width:100%;
+    height:100%;
+    opacity:1;
+}
+.mapGraph {
+    position: relative;
+    height:1579px;
+}
+#graphic {
+    height:890px;
+    width: 1579px;
+}
+#main{
+    height: 890px;
+}
+.header-icon1,.header-icon2{
+    width:22px;
+    height:22px;
+}

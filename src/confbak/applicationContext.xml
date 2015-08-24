@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd">
+
+
+	<bean id="sessionFactory"
+		class="org.springframework.orm.hibernate3.annotation.AnnotationSessionFactoryBean">
+		<property name="configLocation" value="classpath:hibernate.cfg.xml">
+		</property>
+	</bean>
+	<bean id="ClientgroupDAO" class="com.vrv.dao.ClientgroupDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="ClientuserDAO" class="com.vrv.dao.ClientuserDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="DevicebaseinfoDAO" class="com.vrv.dao.DevicebaseinfoDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="OrglistDAO" class="com.vrv.dao.OrglistDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="RegisteredTerminalService" class="com.vrv.service.RegisteredTerminalService">
+		<property name="devicebaseinfoDao">
+			<ref bean="DevicebaseinfoDAO"></ref>
+		</property>
+		<property name="clientGroupDAO">
+			<ref bean="ClientgroupDAO"></ref>
+		</property>
+	</bean>
+	<bean id="RegisteredTerminalAction" class="com.vrv.action.RegisteredTerminalAction">
+		<property name="DLTService">
+			<ref bean="RegisteredTerminalService"></ref>
+		</property>
+	</bean>
+	<bean id="DevicebaseinfohistoryDAO" class="com.vrv.dao.DevicebaseinfohistoryDAO">
+		<property name="sessionFactory">
+			<ref bean="sessionFactory" />
+		</property>
+	</bean>
+	<bean id="ActiveStateService" class="com.vrv.service.ActiveStateService">
+		<property name="devicebaseinfoDAO">
+			<ref bean="DevicebaseinfoDAO"></ref>
+		</property>
+		<property name="devicebaseinfohistoryDao">
+			<ref bean="DevicebaseinfohistoryDAO"></ref>
+		</property>
+		<property name="clientGroupDAO">
+			<ref bean="ClientgroupDAO"></ref>
+		</property>
+	</bean>
+	<bean id="ActiveStateAction" class="com.vrv.action.ActiveStateAction">
+		<property name="activeStateService">
+			<ref bean="ActiveStateService"></ref>
+		</property>
+		<property name="getOrgListService">
+			<ref bean="GetOrgListService"></ref>
+		</property>
+	</bean>
+	<bean id="DomLoginTerminalService" class="com.vrv.service.DomLoginTerminalService">
+		<property name="devicebaseinfoDao">
+			<ref bean="DevicebaseinfoDAO"></ref>
+		</property>
+		<property name="clientGroupDAO">
+			<ref bean="ClientgroupDAO"></ref>
+		</property>
+	</bean>
+	<bean id="DomLoginTerminalAction" class="com.vrv.action.DomLoginTerminalAction">
+		<property name="DLTService">
+			<ref bean="DomLoginTerminalService"></ref>
+		</property>
+	</bean>
+	<bean id="GetOrgListService" class="com.vrv.service.GetOrgListService">
+		<property name="clientGroupDao">
+			<ref bean="ClientgroupDAO"></ref>
+		</property>
+		<property name="devicebaseinfoDAO">
+			<ref bean="DevicebaseinfoDAO"></ref>
+		</property>
+		<property name="devicebaseinfohistoryDao">
+			<ref bean="DevicebaseinfohistoryDAO"></ref>
+		</property>
+	</bean>
+	<bean id="GetOrgListAction" class="com.vrv.action.GetOrgListAction">
+		<property name="getorglistService">
+			<ref bean="GetOrgListService"></ref>
+		</property>
+	</bean>
+	<bean id="HeadquartersDisplayService" class="com.vrv.service.HeadquartersDisplayService">
+		<property name="devicebaseinfoDao">
+			<ref bean="DevicebaseinfoDAO"></ref>
+		</property>
+		<property name="devicebaseinfohistoryDao">
+			<ref bean="DevicebaseinfohistoryDAO"></ref>
+		</property>
+	</bean>
+	<bean id="HeadquartersDisplayAction" class="com.vrv.action.HeadquartersDisplayAction">
+		<property name="headquartersDisplayService">
+			<ref bean="HeadquartersDisplayService"></ref>
+		</property>
+	</bean>
+
+
+	<!-- by wengjiang -->
+	<bean id="GetDeviceHistoryInfoExcelAction" class="com.vrv.action.getDeviceHistoryInfoExcelAction">
+		<property name="activeStateService">
+			<ref bean="ActiveStateService"></ref>
+		</property>
+		<property name="getOrgListService">
+			<ref bean="GetOrgListService"></ref>
+		</property>
+	</bean>
+	<bean id="GetJustOneDeviceHistoryInfoExcelAction" class="com.vrv.action.getJustOneDeviceHistoryInfoExcelAction">
+		<property name="activeStateService">
+			<ref bean="ActiveStateService"></ref>
+		</property>
+		<property name="getOrgListService">
+			<ref bean="GetOrgListService"></ref>
+		</property>
+	</bean>
+</beans>
